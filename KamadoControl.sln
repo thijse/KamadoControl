@@ -3,16 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lilygo", "lilygo.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GxEPD2-1.2.16", "..\libraries\GxEPD2\GxEPD2-1.2.16.vcxitems", "{EA40D5CD-E790-4BBF-900F-EE78BFA9FDF0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KamadoControl", "KamadoControl.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		..\libraries\GxEPD2\GxEPD2-1.2.16.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		..\libraries\GxEPD\GxEPD-3.1.0.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		..\libraries\GxEPD2\GxEPD2-1.2.16.vcxitems*{ea40d5cd-e790-4bbf-900f-ee78bfa9fdf0}*SharedItemsImports = 9
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
@@ -27,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {2EB52D30-4093-47DE-9753-7BBB6A2AE60E}
+		SolutionGuid = {8AB79050-5BC8-4A71-9C71-50C3F9764DE0}
 	EndGlobalSection
 EndGlobal

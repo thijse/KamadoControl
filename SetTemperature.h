@@ -3,7 +3,7 @@
 #include "arduino.h"
 #include "Screen.h"
 
-class Set
+class SetTemperature
 {
 protected:
 	Screen* _display;
@@ -13,9 +13,9 @@ protected:
 	int                                               _posY;
 	int												 _prevCardSize;
 public:
-	SDCard(
-		Screen* display,
-		const int   sdCardPin);
+	SetTemperature(
+		Screen* display
+		);
 	void init();
 	void update();
 	void draw();
