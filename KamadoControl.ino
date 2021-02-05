@@ -9,6 +9,10 @@
 #include <SD.h>
 #include <SPI.h>
 #include "System.h"
+
+#include "ThermoCouple.h"
+
+// UI
 #include "Screen.h"
 #include "Battery.h"
 #include "Time.h"
