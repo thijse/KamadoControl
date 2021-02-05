@@ -65,12 +65,7 @@ void setup()
     sdSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_SS);
 
     // Settings to reduce power consumption
-    setCpuFrequencyMhz(80);      // Reduce CPU speed
-    btStop();                    // Turn off Bluetooth                                    
-    WiFi.disconnect(true);       // Turn off Wi-Fi   
-    WiFi.mode(WIFI_OFF);
-    adc_power_off();            // Turn off ADC (we are using an external ADC)
-
+    System::PowerSafeMode();
 
     // Initialize display
     display.init(); // 
@@ -106,12 +101,12 @@ void setup()
 
 void loop()
 {
-  battery.update();
-  timer  .update();
-  logo   .update();
-  sdcard .update();
-  display.update(); // Update the screen depending on update requests.
- 
-  System::lightSleepDelay(2000); // put device to light sleep while delaying. Deepsleep will re-initialize device
+    battery.update();
+    timer  .update();
+    logo   .update();
+    sdcard .update();
+    display.update(); // Update the screen depending on update requests.
+    
+    System::lightSleepDelay(2000); // put device to light sleep while delaying. Deepsleep will re-initialize device
 }
 

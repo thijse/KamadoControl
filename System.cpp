@@ -43,6 +43,16 @@ void System::printBootReason()
     }
 }
 
+void System::PowerSafeMode()
+{
+    setCpuFrequencyMhz(80);      // Reduce CPU speed
+    btStop();                    // Turn off Bluetooth                                    
+    WiFi.disconnect(true);       // Turn off Wi-Fi   
+    WiFi.mode(WIFI_OFF);
+    adc_power_off();            // Turn off ADC (we are using an external ADC)
+}
+
+
 void System::lightSleepDelay(uint64_t delay)
 {
     esp_sleep_enable_timer_wakeup(1000L * delay); //delay in mseconds
