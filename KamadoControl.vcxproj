@@ -115,6 +115,7 @@
     <ClInclude Include="Logo.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="MeasureAndControl.h" />
     <ClInclude Include="Screen.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -138,7 +139,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Battery.cpp" />
+    <ClCompile Include="Constants.h" />
     <ClCompile Include="logo.cpp" />
+    <ClCompile Include="MeasureAndControl.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="SDCard.cpp" />
     <ClCompile Include="SetTemperature.cpp" />

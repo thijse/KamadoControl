@@ -93,7 +93,7 @@ private:
 	int8_t _writeIndex;
 	int8_t _newIndex;
 	bool   _isNewBuffer;
-	T _buffers[3];	
+	T      _buffers[3];	
 	SemaphoreHandle_t _mutex = NULL;	
 };
 

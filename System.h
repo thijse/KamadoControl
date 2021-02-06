@@ -10,8 +10,8 @@ class System
 {
     protected:
 public: 
-        static void printBootReason();
-        static void PowerSafeMode();
-        static void lightSleepDelay(uint64_t delay);
-        static void deepSleepDelay(uint64_t delay);
+    static void printBootReason();
+    static void PowerSafeMode();
+    static void lightSleepDelay(uint64_t delay);
+    static void deepSleepDelay(uint64_t delay);
 };
