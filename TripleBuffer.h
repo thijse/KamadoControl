@@ -29,7 +29,7 @@ public:
 	/// Gets the most recently written buffer
 	/// </summary>
 	/// <returns>Pointer to buffer of type T</returns>
-	T* GetReadBuffer()
+	T* getReadBuffer()
 	{
 		if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
 		{
@@ -44,7 +44,7 @@ public:
 	/// Gets the most recently written buffer if a new one is available
 	/// </summary>
 	/// <returns>Pointer to buffer of type T if a buffer has been updated since last read. If not, returns nullptr</returns>
-	T* GetNewReadBuffer()
+	T* getNewReadBuffer()
 	{
 		bool isNewBuffer;
 		if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
@@ -61,14 +61,14 @@ public:
 	/// Gets a buffer to write in. Release after the values have been set
 	/// </summary>
 	/// <returns>Pointer to buffer of type T</returns>
-	T* GetWriteBuffer() {
+	T* getWriteBuffer() {
 		return (_writeIndex >= 0) ? &_buffers[_writeIndex] : nullptr;
 	}
 
 	/// <summary>
 	/// Release the buffer to write in. Do this always after GetNewReadBuffer.
 	/// </summary>
-	void ReleaseWriteBuffer()
+	void releaseWriteBuffer()
 	{
 		if (xSemaphoreTake(_mutex, (TickType_t)0))
 		{
@@ -80,7 +80,6 @@ public:
 			case 1: _writeIndex = (_readIndex == 2) ? 0 : 2; break;
 			case 2: _writeIndex = (_readIndex == 0) ? 1 : 0; break;
 			}
-
 			xSemaphoreGive(_mutex);
 		}
 	}
@@ -89,11 +88,11 @@ private:
 	TripleBuffer(const TripleBuffer& other);				// = delete;
 	TripleBuffer& operator=(const TripleBuffer& other);		// = delete;
     	
-	int8_t _readIndex;
-	int8_t _writeIndex;
-	int8_t _newIndex;
-	bool   _isNewBuffer;
-	T      _buffers[3];	
+	int8_t            _readIndex;
+	int8_t            _writeIndex;
+	int8_t            _newIndex;
+	bool              _isNewBuffer;
+	T                 _buffers[3];	
 	SemaphoreHandle_t _mutex = NULL;	
 };
 

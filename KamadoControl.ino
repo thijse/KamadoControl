@@ -1,3 +1,5 @@
+
+
 // https://savjee.be/2019/12/esp32-tips-to-increase-battery-life/
 // https://www.robmiles.com/journal/2020/1/20/disabling-the-esp32-brownout-detector
 
@@ -62,8 +64,8 @@ SDCard            sdcard (&display, SDCARD_SS);
 
 
 
-void TaskMain(void* pvParameters);
-void TaskMeasureAndControl(void* pvParameters);
+void taskMain(void* pvParameters);
+void taskMeasureAndControl(void* pvParameters);
 
 void setup() {
 
@@ -101,7 +103,7 @@ void setup() {
     display.display(false); // full update
 
     xTaskCreatePinnedToCore(
-        TaskMain
+        taskMain
         , "TaskMain"
         , 1024  // Todo: stack size can be checked & adjusted by reading the Stack Highwater
         , NULL
@@ -110,7 +112,7 @@ void setup() {
         , ARDUINO_RUNNING_CORE); // The core running Arduino
 
     xTaskCreatePinnedToCore(
-        TaskMeasureAndControl
+        taskMeasureAndControl
         , "TaskMeasureAndControl"
         , 1024  // Stack size
         , NULL
@@ -129,7 +131,7 @@ void loop()
 /*---------------------- Tasks ---------------------*/
 
 
-void TaskMain(void* pvParameters)
+void taskMain(void* pvParameters)
 {
     (void)pvParameters;
 
@@ -142,21 +144,28 @@ void TaskMain(void* pvParameters)
         sdcard .update();
         display.update(); // Update the screen depending on update requests.
 
-        auto* data = measureControl.GetMeasurements();
-        if (data!=nullptr) Serial.print("Temperature: "); Serial.println(data->Temperature[0]);
+        measureControl.SetTargetTemperature(220);
 
+        MeasurementData* data = measureControl.GetMeasurements();
+        if (data != nullptr) {
+            Serial.print("Temperature 0     : ")       ; Serial.println(data->Temperature[0]);
+            Serial.print("Temperature 1     : ")       ; Serial.println(data->Temperature[1]);
+            Serial.print("Temperature 2     : ")       ; Serial.println(data->Temperature[2]);
+            Serial.print("Temperature 3     : ")       ; Serial.println(data->Temperature[3]);
+            Serial.print("Target Temperature: ")  ; Serial.println(data->targetTemperature);
+        }
         vTaskDelay(1000 / portTICK_PERIOD_MS); // wait for one second
     }
 }
 
-void TaskMeasureAndControl(void* pvParameters)  // This is a task.
+void taskMeasureAndControl(void* pvParameters)  // This is a task.
 {
     (void)pvParameters;
 
     for (;;)
     {
         //Serial.print("Main TaskMeasure and control");
-        measureControl.Run();        
+        measureControl.update();        
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
