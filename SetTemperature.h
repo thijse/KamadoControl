@@ -6,12 +6,12 @@
 class SetTemperature
 {
 protected:
-	Screen* _display;
-	const int                                         _sdCardPin;
+	Screen*   _display;
+	const int _sdCardPin;
 	SPIClass* _spiClass;
-	int                                               _posX;
-	int                                               _posY;
-	int												 _prevCardSize;
+	int        _posX;
+	int        _posY;
+	int		   _prevCardSize;
 public:
 	SetTemperature(
 		Screen* display
@@ -20,7 +20,3 @@ public:
 	void update();
 	void draw();
 };
-
-
-
-

@@ -1,5 +1,3 @@
-
-
 // https://savjee.be/2019/12/esp32-tips-to-increase-battery-life/
 // https://www.robmiles.com/journal/2020/1/20/disabling-the-esp32-brownout-detector
 
@@ -32,25 +30,6 @@
 #include <Fonts/FreeMonoBold18pt7b.h>
 #include <Fonts/FreeMonoBold24pt7b.h>
 
-// SPI pins
-#define SPI_MOSI    23
-#define SPI_MISO    -1
-#define SPI_CLK     18
-
-// Screen pins
-#define ELINK_SS      5
-#define ELINK_BUSY    4
-#define ELINK_RESET  16
-#define ELINK_DC     17
-
-// SPI pins for SD card reader
-#define SDCARD_SS    13
-#define SDCARD_CLK   14
-#define SDCARD_MOSI  15
-#define SDCARD_MISO   2
-
-#define BUTTON_PIN   39
-#define BATTERY_PIN  35
 
 Screen display(ELINK_SS, ELINK_DC, ELINK_RESET, ELINK_BUSY);
 SPIClass sdSPI(VSPI);
@@ -119,8 +98,7 @@ void setup() {
         , 1     // Priority
         , NULL
         , 0);   // The core not running Arduino
-
-    // Now the task scheduler, which takes over control of scheduling individual tasks, is automatically started.
+    
 }
 
 void loop()
@@ -148,10 +126,10 @@ void taskMain(void* pvParameters)
 
         MeasurementData* data = measureControl.GetMeasurements();
         if (data != nullptr) {
-            Serial.print("Temperature 0     : ")       ; Serial.println(data->Temperature[0]);
-            Serial.print("Temperature 1     : ")       ; Serial.println(data->Temperature[1]);
-            Serial.print("Temperature 2     : ")       ; Serial.println(data->Temperature[2]);
-            Serial.print("Temperature 3     : ")       ; Serial.println(data->Temperature[3]);
+            Serial.print("Temperature 0     : ")  ; Serial.println(data->Temperature[0]);
+            Serial.print("Temperature 1     : ")  ; Serial.println(data->Temperature[1]);
+            Serial.print("Temperature 2     : ")  ; Serial.println(data->Temperature[2]);
+            Serial.print("Temperature 3     : ")  ; Serial.println(data->Temperature[3]);
             Serial.print("Target Temperature: ")  ; Serial.println(data->targetTemperature);
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS); // wait for one second

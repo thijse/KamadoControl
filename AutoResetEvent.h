@@ -1,7 +1,6 @@
 #pragma once
 #include "arduino.h"
 
-
 class AutoResetEvent
 {
 public:
@@ -48,8 +47,6 @@ public:
 	{		
 		xSemaphoreTake(_binary, (TickType_t)portMAX_DELAY);
 	}
-
-
 
 private:
 	AutoResetEvent(const AutoResetEvent& other);				// = delete;

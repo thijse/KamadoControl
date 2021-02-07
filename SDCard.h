@@ -23,7 +23,3 @@ public:
 	void update();
 	void draw();
 };
-
-
-
-

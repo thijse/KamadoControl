@@ -38,7 +38,3 @@ class Battery
 		void update();
 		void draw();
 };
-
-
-
-
