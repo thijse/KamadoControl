@@ -5,6 +5,9 @@ template <class T>
 class TripleBuffer
 {
 public:
+	TripleBuffer(const TripleBuffer& other)            = delete;			
+	TripleBuffer& operator=(const TripleBuffer& other) = delete;
+
 	TripleBuffer() : 
 		_readIndex  (-1),
 		_writeIndex ( 0),
@@ -46,7 +49,7 @@ public:
 	/// <returns>Pointer to buffer of type T if a buffer has been updated since last read. If not, returns nullptr</returns>
 	T* getNewReadBuffer()
 	{
-		bool isNewBuffer;
+		bool isNewBuffer = false;
 		if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
 		{
 			isNewBuffer  = _isNewBuffer;
@@ -85,14 +88,13 @@ public:
 	}
 
 private:
-	TripleBuffer(const TripleBuffer& other);				// = delete;
-	TripleBuffer& operator=(const TripleBuffer& other);		// = delete;
+	
     	
 	int8_t            _readIndex;
 	int8_t            _writeIndex;
 	int8_t            _newIndex;
 	bool              _isNewBuffer;
 	T                 _buffers[3];	
-	SemaphoreHandle_t _mutex = NULL;	
+	SemaphoreHandle_t _mutex = nullptr;	
 };
 

@@ -1,7 +1,7 @@
 // https://savjee.be/2019/12/esp32-tips-to-increase-battery-life/
 // https://www.robmiles.com/journal/2020/1/20/disabling-the-esp32-brownout-detector
 
-
+#include <ArduinoLog.h>
 #include "WiFi.h" 
 #include "driver/adc.h"
 #include <esp_wifi.h>
@@ -19,7 +19,8 @@
 #include "Screen.h"
 #include "Battery.h"
 #include "Time.h"
-#include "Logo.h"
+#include "SetTemperature.h"
+//#include "Logo.h"
 #include "SDCard.h"
 #include "Battery.h"
 #include "Timer.h"
@@ -38,9 +39,10 @@ MeasureAndControl measureControl;
 
 Battery           battery(&display, BATTERY_PIN);
 Timer             timer  (&display);
-Logo              logo   (&display);
-SDCard            sdcard (&display, SDCARD_SS);
-
+SetTemperature    setTemperature(&display);
+//Logo              logo   (&display);
+//SDCard            sdcard (&display, SDCARD_SS);
+int               loopCounter;
 
 
 void taskMain(void* pvParameters);
@@ -50,8 +52,12 @@ void setup() {
 
     // initialize serial communication at 115200 bits per second:
     Serial.begin(115200);
-    Serial.println();
-    Serial.println("setup");
+    while (!Serial && !Serial.available()) {}
+    Log.begin(LOG_LEVEL_VERBOSE, &Serial);
+
+    Log.traceln(F("setup KamadoControl"));
+    loopCounter  = 0;
+
     SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI, ELINK_SS);
     sdSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_SS);
 
@@ -60,7 +66,7 @@ void setup() {
 
     // Initialize display
     display.init(); // 
-    display.setRotation(1);
+    display.setRotation(3);
     display.setFullWindow();
     display.fillScreen(GxEPD_WHITE);
     display.setTextColor(GxEPD_BLACK);
@@ -70,21 +76,23 @@ void setup() {
     // Initialize UI elements
     battery.init();
     timer  .init();
-    logo   .init();
-    sdcard .init(&sdSPI);
+    setTemperature.init();
+    //logo   .init();
+    //sdcard .init(&sdSPI);
 
     // Draw UI elements
     display.fillScreen(GxEPD_WHITE);
     battery.draw();
     timer  .draw();
-    logo   .draw();
-    sdcard .draw();
+    setTemperature.draw();
+    //logo   .draw();
+    //sdcard .draw();
     display.display(false); // full update
 
     xTaskCreatePinnedToCore(
         taskMain
         , "TaskMain"
-        , 1024  // Todo: stack size can be checked & adjusted by reading the Stack Highwater
+        , 4096  // Todo: stack size can be checked & adjusted by reading the Stack Highwater
         , NULL
         , 2  // 
         , NULL
@@ -93,7 +101,7 @@ void setup() {
     xTaskCreatePinnedToCore(
         taskMeasureAndControl
         , "TaskMeasureAndControl"
-        , 1024  // Stack size
+        , 2048  // Stack size
         , NULL
         , 1     // Priority
         , NULL
@@ -115,14 +123,18 @@ void taskMain(void* pvParameters)
 
     for (;;) // A Task shall never return or exit.
     {
+        Log.traceln(F("loop %d"),loopCounter++);
         (void)pvParameters;
         battery.update();
         timer  .update();
-        logo   .update();
-        sdcard .update();
+        setTemperature.update();
+       //logo   .update();
+        //sdcard .update();
         display.update(); // Update the screen depending on update requests.
 
-        measureControl.SetTargetTemperature(220);
+        measureControl.SetTargetTemperature(setTemperature.getTargetTemperature());
+        //setTemperature.setCurrentTemperature();
+
 
         MeasurementData* data = measureControl.GetMeasurements();
         if (data != nullptr) {
@@ -132,7 +144,7 @@ void taskMain(void* pvParameters)
             Serial.print("Temperature 3     : ")  ; Serial.println(data->Temperature[3]);
             Serial.print("Target Temperature: ")  ; Serial.println(data->targetTemperature);
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // wait for one second
+        vTaskDelay(10 / portTICK_PERIOD_MS); // wait for one second
     }
 }
 
@@ -142,7 +154,6 @@ void taskMeasureAndControl(void* pvParameters)  // This is a task.
 
     for (;;)
     {
-        //Serial.print("Main TaskMeasure and control");
         measureControl.update();        
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }

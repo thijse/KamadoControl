@@ -1,4 +1,5 @@
 #include "MeasureAndControl.h"
+#include "ArduinoLog.h"
 
 MeasureAndControl::MeasureAndControl() :
     pidControl(2, 5, 1, PID::Direct, PID::P_On::Measurement),
@@ -28,8 +29,8 @@ void MeasureAndControl::update()
 
     // Todo: store per measurement status (success, failure)
     MeasurementData* measurement   = measurements.getWriteBuffer();
-    measurement->Temperature[0]    = 1.0f; //ReadTemperature(thermo1);
-    measurement->Temperature[1]    = 2.0f; //ReadTemperature(thermo2);
+    measurement->Temperature[0]    = ReadTemperature(thermo1);
+    measurement->Temperature[1]    = ReadTemperature(thermo2);
     measurement->Temperature[2]    = 3.0f;
     measurement->Temperature[3]    = 4.0f;
     measurement->targetTemperature = targetTemp;
@@ -60,7 +61,7 @@ void MeasureAndControl::ConfigureThermoSensor(ThermoCouple& thermo)
     sconfig.SetFilterCoefficients(0);
     sconfig.SetThermoCoupleType(TCThermoCoupleType::K);
 
-    if (!thermo.SetSensorConfiguration(sconfig)) {Serial.println("Failed setting sensor configuration"); } else { Serial.println("Sensor configured"); }
+    if (!thermo.SetSensorConfiguration(sconfig)) {Log.errorln("Failed setting sensor configuration"); } else { Log.noticeln("Sensor configured"); }
 }
 
 /// <summary>
@@ -77,18 +78,19 @@ float MeasureAndControl::ReadTemperature(ThermoCouple& thermo)
     int n;
 
     // Setup for single 16 bit conversion
-    TCDeviceConfig config;
+    TCDeviceConfig config{};
     config.SetShutdownMode(TCShutdownMode::Burst);
     config.SetBurstModeSamples(1);
     config.SetMeasurementResolution(TCMeasurementResolution::Bit16);
 
     if (!thermo.ClearStatus() || !thermo.SetDeviceConfiguration(config))
     {
-        Serial.println("Failed starting conversion");
+        Log.errorln(F("Failed starting conversion"));
+        return 0;
     }
     else
     {
-        TCStatus stat;
+        TCStatus stat{};
         delay(110);
         for (n = 0; n < 2; n++)
         {
@@ -97,19 +99,19 @@ float MeasureAndControl::ReadTemperature(ThermoCouple& thermo)
         }
         if (!stat.BurstComplete())
         {
-            //sprintf(buf, "Failed while waiting for conversion (%d of 2 attempts)", n);
+            Log.errorln(F("Failed while waiting for conversion (%d of 2 attempts)"),n);
         }
         else
         {
-            int temp;
+            int temp= 0;
             if (!thermo.GetTemperature(temp))
             {
-                Serial.println("Failed reading temperature");
+                Log.errorln(F("Failed reading temperature"));
             }
             else
             {
                 //sprintf(buf, "Temperature (1/16th of a degree): %d", temp);
-                return temp*6.25E-2;
+                return 6.25E-2 * temp;
             }
         }
     }

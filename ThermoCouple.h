@@ -101,7 +101,10 @@ class ThermoCouple {
   private:
       uint8_t address;
       
-  public:  
+  public:
+      ThermoCouple(const ThermoCouple& other)            = delete;
+      ThermoCouple& operator=(const ThermoCouple& other) = delete;
+
       // Constructor
       ThermoCouple(uint8_t _address);
       // Destructor
@@ -114,7 +117,7 @@ class ThermoCouple {
       // Get temperature in 1/16th degrees
       bool GetTemperature(int &temperature);
       // Get cold junction temperature
-      bool GetColdJunctionTemperature(int &temperature);
+      bool GetColdJunctionTemperature(int &temperature) const;
       // Get/set device configuration
       bool GetDeviceConfiguration(TCDeviceConfig &config);
       bool SetDeviceConfiguration(TCDeviceConfig &config);
@@ -123,7 +126,7 @@ class ThermoCouple {
       bool SetSensorConfiguration(TCSensorConfig &config);
 
   private:
-      bool ReadRegister (TCRegister reg, int count);
-      bool WriteRegister(TCRegister reg, byte value);
+      bool ReadRegister (TCRegister reg, int count) const;
+      bool WriteRegister(TCRegister reg, byte value) const;
 };
 

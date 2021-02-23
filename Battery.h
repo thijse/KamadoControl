@@ -27,6 +27,8 @@ class Battery
 		int           _prevBarLength;
 
 	public:
+		Battery(const Battery& other) = delete;
+		Battery& operator=(const Battery& other) = delete;
 		Battery(
 			Screen* display,
 			const int   batteryPin

@@ -75,3 +75,20 @@ void System::deepSleepDelay(uint64_t delay)
     esp_sleep_enable_timer_wakeup(1000L * delay); //delay in mseconds
     esp_deep_sleep_start();
 }
+
+
+/// <summary>
+/// Set fitting delay depending on interactivity required
+/// </summary>
+void System::dynamicDelay()
+{
+    // if less than n minutes since last interaction, go in deepsleep, other 
+}
+
+/// <summary>
+/// Call input event to let system know it is being interacted with, and should
+/// not go in sleep state.
+/// </summary>
+void System::inputEvent()
+{
+}

@@ -16,6 +16,8 @@ protected:
 	int         _posY;
 	int		    _prevCardSize;
 public:
+	SDCard(const SDCard& other) = delete;
+	SDCard& operator=(const SDCard& other) = delete;
 	SDCard(
 		Screen* display,
 		const int   sdCardPin);

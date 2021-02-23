@@ -20,6 +20,8 @@ protected:
 
 	const static unsigned char lilygo[];
 public:
+	Logo(const Logo& other)            = delete;
+	Logo& operator=(const Logo& other) = delete;
 	Logo(Screen* display);
 	void init();
 	void update();

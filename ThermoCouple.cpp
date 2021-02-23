@@ -64,7 +64,7 @@ bool ThermoCouple::SetDeviceConfiguration(TCDeviceConfig &config)
 /// <summary>
 /// Get status
 /// </summary>
-/// <param name="config"></param>
+/// <param name="status">Returns thermocouple status</param>
 /// <returns>True on success, false on failure</returns> 
 bool ThermoCouple::GetStatus(TCStatus &status)
 {  
@@ -111,7 +111,7 @@ bool ThermoCouple::GetTemperature(int &temperature)
 /// </summary>
 /// <param name="temperature">Return cold junction temperature</param>
 /// <returns>True on success</returns>
-bool ThermoCouple::GetColdJunctionTemperature(int &temperature)
+bool ThermoCouple::GetColdJunctionTemperature(int &temperature) const
 {
     if (!this->ReadRegister(TCRegister::TCold, 2)) return false;
     temperature = (Wire.read()<<8) | Wire.read();
@@ -121,7 +121,7 @@ bool ThermoCouple::GetColdJunctionTemperature(int &temperature)
 /// <summary>
 /// Write Register
 /// </summary>
-bool ThermoCouple::WriteRegister(TCRegister reg, byte value)
+bool ThermoCouple::WriteRegister(TCRegister reg, byte value) const
 {
   Wire.beginTransmission(this->address);   // talk to TC 
   Wire.write((byte) reg);   
@@ -132,7 +132,7 @@ bool ThermoCouple::WriteRegister(TCRegister reg, byte value)
 /// <summary>
 /// Read Register
 /// </summary>
-bool ThermoCouple::ReadRegister(TCRegister reg, int count)
+bool ThermoCouple::ReadRegister(TCRegister reg, int count) const
 {
   Wire.beginTransmission(this->address);   // talk to TC
   Wire.write((byte) reg);   // status register

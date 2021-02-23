@@ -12,10 +12,12 @@ class Timer
 {
 protected:
 	Screen*       _display;
-	int16         _t  _x;
-	int16         _t  _y;
-	uint16        _t _w;
-	uint16        _t _h;
+	int           _posX;
+	int           _posY;
+	int16_t       _x;
+	int16_t       _y;
+	uint16_t      _w;
+	uint16_t      _h;
 	unsigned long _time_start_ms;
 	char          _prevTime[6];
 public:

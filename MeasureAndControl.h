@@ -3,10 +3,11 @@
 #pragma once
 
 #include "arduino.h"
+#include <ArduinoLog.h>
 #include <PID_v2.h>
 #include "ThermoCouple.h"
 #include "TripleBuffer.h"
-#include "Property.h"
+#include "State.h"
 
 
 struct MeasurementData {
@@ -22,10 +23,12 @@ private:
     ThermoCouple thermo1;
     ThermoCouple thermo2;
     TripleBuffer<MeasurementData> measurements;
-    Property<float> targetTemperature;
+    State<float> targetTemperature;
     void ConfigureThermoSensor(ThermoCouple& thermo);
     void setServo(float servoTarget);
 public:
+    MeasureAndControl(const MeasureAndControl& other)            = delete;
+    MeasureAndControl& operator=(const MeasureAndControl& other) = delete;
     MeasureAndControl();
     ~MeasureAndControl();
     void update();

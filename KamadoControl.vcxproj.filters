@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Fonts">
+      <UniqueIdentifier>{7de018a7-978a-42a7-939d-d696e6d666c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="KamadoControl.ino" />
@@ -54,8 +57,23 @@
     <ClInclude Include="MeasureAndControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Property.h">
+    <ClInclude Include="State.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts\FreeSansBold8pt7b.h">
+      <Filter>Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts\FreeSans7pt7b.h">
+      <Filter>Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts\FreeSans8pt7b.h">
+      <Filter>Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts\FreeSansBold7pt7b.h">
+      <Filter>Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts\FreeSansBold32pt7b.h">
+      <Filter>Fonts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

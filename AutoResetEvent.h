@@ -4,6 +4,8 @@
 class AutoResetEvent
 {
 public:
+	AutoResetEvent(const AutoResetEvent& other)            = delete;
+	AutoResetEvent& operator=(const AutoResetEvent& other) = delete;
 
 	/// <summary>
 	/// start blocked (waiting for signal)
