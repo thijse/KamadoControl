@@ -5,9 +5,12 @@
 #include "arduino.h"
 #include <ArduinoLog.h>
 #include <PID_v2.h>
+
+#include "ADC.h"
 #include "ThermoCouple.h"
 #include "TripleBuffer.h"
 #include "State.h"
+#include "Thermistor.h"
 
 
 struct MeasurementData {
@@ -20,12 +23,15 @@ class MeasureAndControl
 {
 private:
     PID_v2 pidControl;
+    ADC          adc;
     ThermoCouple thermo1;
     ThermoCouple thermo2;
+    Thermistor   thermistor1;
+    Thermistor   thermistor2;
     TripleBuffer<MeasurementData> measurements;
     State<float> targetTemperature;
-    void ConfigureThermoSensor(ThermoCouple& thermo);
-    void setServo(float servoTarget);
+    static void ConfigureThermoSensor(ThermoCouple& thermo);
+    static void setServo(float servoTarget);
 public:
     MeasureAndControl(const MeasureAndControl& other)            = delete;
     MeasureAndControl& operator=(const MeasureAndControl& other) = delete;
@@ -33,6 +39,7 @@ public:
     ~MeasureAndControl();
     void update();
     MeasurementData* GetMeasurements();
-    float ReadTemperature(ThermoCouple& thermo);
+    static float ReadTemperature(ThermoCouple& thermo);
+    static float ReadTemperature(Thermistor& thermistor);
     void SetTargetTemperature(float targetTemp);
 };

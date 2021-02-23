@@ -78,6 +78,12 @@
     <ClInclude Include="RotaryEncoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ADC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thermistor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Battery.cpp">
@@ -111,6 +117,12 @@
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="RotaryEncoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ADC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Thermistor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

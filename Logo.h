@@ -1,6 +1,5 @@
 #pragma once
-// Time
-#pragma once 
+
 #include "arduino.h"
 
 #include <GxEPD2_GFX.h>

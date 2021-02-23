@@ -9,8 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArduinoLog-1.0.3", "C:\User
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		C:\Users\thijs\Documents\Arduino\libraries\ArduinoLog\ArduinoLog-1.0.3.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		C:\Users\thijs\Documents\Arduino\libraries\ArduinoLog\ArduinoLog-1.0.3.vcxitems*{e9e48897-ff60-47c3-98ce-5008482cbd4b}*SharedItemsImports = 9
+		..\..\..\..\..\thijs\Documents\Arduino\libraries\ArduinoLog\ArduinoLog-1.0.3.vcxitems*{e9e48897-ff60-47c3-98ce-5008482cbd4b}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86

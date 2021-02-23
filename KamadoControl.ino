@@ -51,6 +51,9 @@ void taskMeasureAndControl(void* pvParameters);
 void setup() {
 
     // initialize serial communication at 115200 bits per second:
+    Wire.setClock(100000L);
+    Wire.begin(I2C_SDA, I2C_SCL);
+
     Serial.begin(115200);
     while (!Serial && !Serial.available()) {}
     Log.begin(LOG_LEVEL_VERBOSE, &Serial);
@@ -155,6 +158,6 @@ void taskMeasureAndControl(void* pvParameters)  // This is a task.
     for (;;)
     {
         measureControl.update();        
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }

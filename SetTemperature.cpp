@@ -12,7 +12,7 @@ SetTemperature::SetTemperature(Screen* display) :
     _temp(20)
 {
     Serial.print("SetTemperature:ctor");
-    _rotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN);
+    _rotaryEncoder = RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN);
     if (pointerToSetTemperature!=nullptr)
     {
         Log.errorln(F("Already a SetTemperature class instantiated. There can be only one "));

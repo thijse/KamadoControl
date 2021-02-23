@@ -7,6 +7,10 @@
 #define ARDUINO_RUNNING_CORE 1
 #endif
 
+// I2C pins
+#define I2C_SDA                   21
+#define I2C_SCL                   22
+
 // SPI pins
 #define SPI_MOSI                  23
 #define SPI_MISO                  -1

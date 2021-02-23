@@ -3,17 +3,19 @@
 
 MeasureAndControl::MeasureAndControl() :
     pidControl(2, 5, 1, PID::Direct, PID::P_On::Measurement),
-    thermo1   (0x60),
-    thermo2   (0x60)
+    adc        (0x40   ),
+    thermo1    (0x60   ),
+    thermo2    (0x60   ),
+    thermistor1(&adc, 0),
+    thermistor2(&adc, 1)
 {
     ConfigureThermoSensor(thermo1);
-    ConfigureThermoSensor(thermo2);
+    ConfigureThermoSensor(thermo2);    
 
-    // todo: move to init ?
     pidControl.Start(
         20.0f,    // input
         0,        // current output
-        20.0f);   // setpoint
+        20.0f);   // set-point
 }
 
 MeasureAndControl::~MeasureAndControl()
@@ -25,19 +27,19 @@ MeasureAndControl::~MeasureAndControl()
 /// </summary>
 void MeasureAndControl::update()
 {
-    float targetTemp = targetTemperature.get();
+    const float targetTemp = targetTemperature.get();
 
     // Todo: store per measurement status (success, failure)
     MeasurementData* measurement   = measurements.getWriteBuffer();
-    measurement->Temperature[0]    = ReadTemperature(thermo1);
-    measurement->Temperature[1]    = ReadTemperature(thermo2);
-    measurement->Temperature[2]    = 3.0f;
-    measurement->Temperature[3]    = 4.0f;
+    measurement->Temperature[0]    = ReadTemperature(thermo1    );
+    measurement->Temperature[1]    = ReadTemperature(thermo2    );
+    measurement->Temperature[2]    = ReadTemperature(thermistor1);
+    measurement->Temperature[3]    = ReadTemperature(thermistor2);
     measurement->targetTemperature = targetTemp;
     measurements.releaseWriteBuffer();
 
     pidControl.Setpoint(targetTemp);
-    float servoTarget = pidControl.Run(measurement->Temperature[0]);
+    const float servoTarget = (float)pidControl.Run(measurement->Temperature[0]);
     setServo(servoTarget);
 }
 
@@ -57,64 +59,35 @@ MeasurementData* MeasureAndControl::GetMeasurements()
 
 void MeasureAndControl::ConfigureThermoSensor(ThermoCouple& thermo)
 {
-    TCSensorConfig sconfig;
-    sconfig.SetFilterCoefficients(0);
-    sconfig.SetThermoCoupleType(TCThermoCoupleType::K);
+    TCSensorConfig sensorConfig{};
+    sensorConfig.setFilterCoefficients(0);
+    sensorConfig.setThermoCoupleType(TCThermoCoupleType::K);
 
-    if (!thermo.SetSensorConfiguration(sconfig)) {Log.errorln("Failed setting sensor configuration"); } else { Log.noticeln("Sensor configured"); }
+    if (!thermo.setSensorConfiguration(sensorConfig)) {Log.errorln("Failed setting sensor configuration"); } else { Log.noticeln("Sensor configured"); }
 }
 
-/// <summary>
-/// Read temperature:
-// - Clear status byte (burst mode bit anyway)
-// - Configure device for a single conversion at 16 bits. Manual says 80 ms conversion, ~12 ms calculation resulting in 92 ms total conversion time. Actually seems to be a bit less than 110 ms...
-// - Wait 110 ms (vxDelay in future, multitasking and such!)
-// - Check status byte for 'burst complete'. Should be done 'instantly'.
-// - Read temperature (degrees);
-/// </summary>
-/// <param name="thermo">return </param>
-float MeasureAndControl::ReadTemperature(ThermoCouple& thermo)
+float MeasureAndControl::ReadTemperature(ThermoCouple& thermoCouple)
 {
-    int n;
-
-    // Setup for single 16 bit conversion
-    TCDeviceConfig config{};
-    config.SetShutdownMode(TCShutdownMode::Burst);
-    config.SetBurstModeSamples(1);
-    config.SetMeasurementResolution(TCMeasurementResolution::Bit16);
-
-    if (!thermo.ClearStatus() || !thermo.SetDeviceConfiguration(config))
+    float temperature;
+    const bool success = thermoCouple.getTemperature(temperature);
+    if (!success)
     {
-        Log.errorln(F("Failed starting conversion"));
+        Log.errorln(F("Failed reading thermocouple"));
         return 0;
     }
-    else
+    return temperature;
+}
+
+float MeasureAndControl::ReadTemperature(Thermistor& thermistor)
+{
+    float temperature;
+    const bool success = thermistor.getTemperature(temperature);
+    if (!success)
     {
-        TCStatus stat{};
-        delay(110);
-        for (n = 0; n < 2; n++)
-        {
-            if (!thermo.GetStatus(stat) || stat.BurstComplete()) break;
-            delay(10);
-        }
-        if (!stat.BurstComplete())
-        {
-            Log.errorln(F("Failed while waiting for conversion (%d of 2 attempts)"),n);
-        }
-        else
-        {
-            int temp= 0;
-            if (!thermo.GetTemperature(temp))
-            {
-                Log.errorln(F("Failed reading temperature"));
-            }
-            else
-            {
-                //sprintf(buf, "Temperature (1/16th of a degree): %d", temp);
-                return 6.25E-2 * temp;
-            }
-        }
+        Log.errorln(F("Failed reading thermistor"));
+        return 0;
     }
+    return temperature;
 }
 
 void MeasureAndControl::SetTargetTemperature(float targetTemp)

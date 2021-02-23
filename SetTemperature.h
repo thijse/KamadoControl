@@ -2,9 +2,10 @@
 #pragma once 
 #include "arduino.h"
 #include <ArduinoLog.h>
-#include <AiEsp32RotaryEncoder.h>
-#include "Screen.h"
 #include "Constants.h"
+#include "RotaryEncoder.h"
+#include "Screen.h"
+
 
 
 class SetTemperature
@@ -25,7 +26,7 @@ public:
 	SetTemperature& operator=(const SetTemperature& other) = delete;
 	SetTemperature(Screen* display);
 	
-	AiEsp32RotaryEncoder _rotaryEncoder;
+	RotaryEncoder _rotaryEncoder;
 	void init();
 	void update();
     void rotaryInput();

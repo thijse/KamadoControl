@@ -1,5 +1,6 @@
 #pragma once 
 #include "arduino.h"
+#include "ArduinoLog.h"
 
 enum class TCShutdownMode : byte
 {
@@ -44,9 +45,9 @@ struct TCStatus {
     public:
       byte status;
 
-      bool BurstComplete() { return (status&128) != 0; };
-      bool OpenCircuit()   { return (status&32 ) != 0; };
-      bool ShortCircuit()  { return (status&16 ) != 0; };   
+      bool burstComplete() { return (status&128) != 0; };
+      bool openCircuit()   { return (status&32 ) != 0; };
+      bool shortCircuit()  { return (status&16 ) != 0; };   
 };
 
 
@@ -55,15 +56,15 @@ struct TCDeviceConfig {
     public:
       byte config;
 
-      TCColdJunctionResolution ColdJunctionResolution() { return (TCColdJunctionResolution) (config & (byte) TCColdJunctionResolution::Mask);};
-      TCMeasurementResolution  MeasurementResolution()  { return (TCMeasurementResolution)  (config & (byte) TCMeasurementResolution::Mask );};
-      TCShutdownMode           ShutdownMode()           { return (TCShutdownMode)           (config & (byte) TCShutdownMode::Mask          );};
-      byte                     BurstModeSamples()       { return                           ((config & 0x1C) >> 2) + 1                       ;};
+      TCColdJunctionResolution coldJunctionResolution() { return (TCColdJunctionResolution) (config & (byte) TCColdJunctionResolution::Mask);};
+      TCMeasurementResolution  measurementResolution()  { return (TCMeasurementResolution)  (config & (byte) TCMeasurementResolution::Mask );};
+      TCShutdownMode           shutdownMode()           { return (TCShutdownMode)           (config & (byte) TCShutdownMode::Mask          );};
+      byte                     burstModeSamples()       { return                           ((config & 0x1C) >> 2) + 1                       ;};
 
-      void                   SetBurstModeSamples(byte count)                         { config = (config & (~0x1C))                                  | ((count - 1) << 2); };
-      void                   SetColdJunctionResolution(TCColdJunctionResolution res) { config = (config & (~(byte) TCColdJunctionResolution::Mask)) | (byte) res;         };
-      void                   SetMeasurementResolution(TCMeasurementResolution res)   { config = (config & (~(byte) TCMeasurementResolution::Mask))  | (byte) res;         };
-      void                   SetShutdownMode(TCShutdownMode mode)                    { config = (config & (~(byte) TCShutdownMode::Mask))           | (byte) mode;        };
+      void                   setBurstModeSamples(byte count)                         { config = (config & (~0x1C))                                  | ((count - 1) << 2); };
+      void                   setColdJunctionResolution(TCColdJunctionResolution res) { config = (config & (~(byte) TCColdJunctionResolution::Mask)) | (byte) res;         };
+      void                   setMeasurementResolution(TCMeasurementResolution res)   { config = (config & (~(byte) TCMeasurementResolution::Mask))  | (byte) res;         };
+      void                   setShutdownMode(TCShutdownMode mode)                    { config = (config & (~(byte) TCShutdownMode::Mask))           | (byte) mode;        };
 };
 
 
@@ -72,11 +73,11 @@ struct TCSensorConfig {
   public:
       byte config;
 
-      byte FilterCoefficients()                       { return (config & 0x07); };
-      TCThermoCoupleType ThermoCoupleType()           { return (TCThermoCoupleType) (config & (byte) TCThermoCoupleType::Mask);};
+      byte filterCoefficients()                       { return (config & 0x07); };
+      TCThermoCoupleType thermoCoupleType()           { return (TCThermoCoupleType) (config & (byte) TCThermoCoupleType::Mask);};
   
-      void SetFilterCoefficients(byte n)              { config = (config &  ~0x07) | n; };
-      void SetThermoCoupleType(TCThermoCoupleType tc) { config = (config & (~(byte) TCThermoCoupleType::Mask)) | (byte) tc; };
+      void setFilterCoefficients(byte n)              { config = (config &  ~0x07) | n; };
+      void setThermoCoupleType(TCThermoCoupleType tc) { config = (config & (~(byte) TCThermoCoupleType::Mask)) | (byte) tc; };
 };
 
 
@@ -110,23 +111,25 @@ class ThermoCouple {
       // Destructor
       ~ThermoCouple();
       // Get status
-      bool GetStatus(TCStatus &status);      
-      bool ClearStatus();
+      bool getStatus(TCStatus &status);      
+      bool clearStatus();
       // Get ID and version
-      bool GetDeviceID(byte &id);
+      bool getDeviceID(byte &id);
+      // Read temperature multiple times
+      bool getTemperature(float& temperature);
       // Get temperature in 1/16th degrees
-      bool GetTemperature(int &temperature);
+      bool getTemperatureRegister(int &temperature);
       // Get cold junction temperature
-      bool GetColdJunctionTemperature(int &temperature) const;
+      bool getColdJunctionTemperature(int &temperature) const;
       // Get/set device configuration
-      bool GetDeviceConfiguration(TCDeviceConfig &config);
-      bool SetDeviceConfiguration(TCDeviceConfig &config);
+      bool getDeviceConfiguration(TCDeviceConfig &config);
+      bool setDeviceConfiguration(TCDeviceConfig &config);
       // Get/set sensor configuration
-      bool GetSensorConfiguration(TCSensorConfig &config);
-      bool SetSensorConfiguration(TCSensorConfig &config);
+      bool getSensorConfiguration(TCSensorConfig &config);
+      bool setSensorConfiguration(TCSensorConfig &config);
 
   private:
-      bool ReadRegister (TCRegister reg, int count) const;
-      bool WriteRegister(TCRegister reg, byte value) const;
+      bool readRegister (TCRegister reg, int count) const;
+      bool writeRegister(TCRegister reg, byte value) const;
 };
 
