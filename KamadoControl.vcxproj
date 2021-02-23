@@ -52,7 +52,6 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
     <Import Project="C:\Users\thijs\Documents\Arduino\libraries\ArduinoLog\ArduinoLog-1.0.3.vcxitems" Label="Shared" />
-    <Import Project="C:\Users\thijs\Documents\Arduino\libraries\ai-esp32-rotary-encoder\ai-esp32-rotary-encoder-1.0.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -123,6 +122,7 @@
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="MeasureAndControl.h" />
+    <ClInclude Include="RotaryEncoder.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="Screen.h">
       <FileType>CppCode</FileType>
@@ -150,6 +150,7 @@
     <ClCompile Include="Constants.h" />
     <ClCompile Include="logo.cpp" />
     <ClCompile Include="MeasureAndControl.cpp" />
+    <ClCompile Include="RotaryEncoder.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="SDCard.cpp" />
     <ClCompile Include="SetTemperature.cpp" />

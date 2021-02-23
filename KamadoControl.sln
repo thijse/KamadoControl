@@ -7,12 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KamadoControl", "KamadoCont
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArduinoLog-1.0.3", "C:\Users\thijs\Documents\Arduino\libraries\ArduinoLog\ArduinoLog-1.0.3.vcxitems", "{E9E48897-FF60-47C3-98CE-5008482CBD4B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ai-esp32-rotary-encoder-1.0", "C:\Users\thijs\Documents\Arduino\libraries\ai-esp32-rotary-encoder\ai-esp32-rotary-encoder-1.0.vcxitems", "{A329C9C1-F5B4-4C8A-A02F-859406E414DF}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		C:\Users\thijs\Documents\Arduino\libraries\ai-esp32-rotary-encoder\ai-esp32-rotary-encoder-1.0.vcxitems*{a329c9c1-f5b4-4c8a-a02f-859406e414df}*SharedItemsImports = 9
-		C:\Users\thijs\Documents\Arduino\libraries\ai-esp32-rotary-encoder\ai-esp32-rotary-encoder-1.0.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		C:\Users\thijs\Documents\Arduino\libraries\ArduinoLog\ArduinoLog-1.0.3.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		C:\Users\thijs\Documents\Arduino\libraries\ArduinoLog\ArduinoLog-1.0.3.vcxitems*{e9e48897-ff60-47c3-98ce-5008482cbd4b}*SharedItemsImports = 9
 	EndGlobalSection
