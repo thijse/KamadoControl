@@ -5,12 +5,7 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KamadoControl", "KamadoControl.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArduinoLog-1.0.3", "C:\Users\thijs\Documents\Arduino\libraries\ArduinoLog\ArduinoLog-1.0.3.vcxitems", "{E9E48897-FF60-47C3-98CE-5008482CBD4B}"
-EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		..\..\..\..\..\thijs\Documents\Arduino\libraries\ArduinoLog\ArduinoLog-1.0.3.vcxitems*{e9e48897-ff60-47c3-98ce-5008482cbd4b}*SharedItemsImports = 9
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
@@ -25,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {8AB79050-5BC8-4A71-9C71-50C3F9764DE0}
+		SolutionGuid = {2EDCEA74-D3CC-4CE2-8F0A-0F8C5375499E}
 	EndGlobalSection
 EndGlobal

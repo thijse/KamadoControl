@@ -4,10 +4,10 @@
 /// <summary>
 /// Initialize Thermocouple
 /// </summary>
-/// <param name="_address">I2C Address</param>
-ThermoCouple::ThermoCouple(uint8_t _address)
+/// <param name="address">I2C Address</param>
+ThermoCouple::ThermoCouple(uint8_t address)
 {
-  this->address = _address;
+  _address = address;
 };
 
 /// <summary>
@@ -22,9 +22,9 @@ ThermoCouple::~ThermoCouple()
 /// </summary>
 /// <param name="config"></param>
 /// <returns></returns>
-bool ThermoCouple::getSensorConfiguration(TCSensorConfig &config)
+bool ThermoCouple::getSensorConfiguration(TCSensorConfig &config) const
 {
-  if (!this->readRegister(TCRegister::SensorConfiguration, 1)) return false;
+  if (!readRegister(TCRegister::SensorConfiguration, 1)) return false;
   config.config = Wire.read();
   return true;
 };
@@ -34,9 +34,9 @@ bool ThermoCouple::getSensorConfiguration(TCSensorConfig &config)
 /// </summary>
 /// <param name="config"></param>
 /// <returns></returns>
-bool ThermoCouple::setSensorConfiguration(TCSensorConfig &config)
+bool ThermoCouple::setSensorConfiguration(TCSensorConfig &config) const
 {
-  return this->writeRegister(TCRegister::SensorConfiguration, config.config);
+  return writeRegister(TCRegister::SensorConfiguration, config.config);
 };
 
 /// <summary>
@@ -44,9 +44,9 @@ bool ThermoCouple::setSensorConfiguration(TCSensorConfig &config)
 /// </summary>
 /// <param name="config"></param>
 /// <returns></returns>
-bool ThermoCouple::getDeviceConfiguration(TCDeviceConfig &config)
+bool ThermoCouple::getDeviceConfiguration(TCDeviceConfig &config) const
 {
-  if (!this->readRegister(TCRegister::DeviceConfiguration, 1)) return false;
+  if (!readRegister(TCRegister::DeviceConfiguration, 1)) return false;
   config.config = Wire.read();
   return true;
 }
@@ -56,9 +56,9 @@ bool ThermoCouple::getDeviceConfiguration(TCDeviceConfig &config)
 /// </summary>
 /// <param name="config"></param>
 /// <returns></returns>
-bool ThermoCouple::setDeviceConfiguration(TCDeviceConfig &config)
+bool ThermoCouple::setDeviceConfiguration(TCDeviceConfig &config) const
 {
-  return this->writeRegister(TCRegister::DeviceConfiguration, config.config);
+  return writeRegister(TCRegister::DeviceConfiguration, config.config);
 }
 
 /// <summary>
@@ -66,9 +66,9 @@ bool ThermoCouple::setDeviceConfiguration(TCDeviceConfig &config)
 /// </summary>
 /// <param name="status">Returns thermocouple status</param>
 /// <returns>True on success, false on failure</returns> 
-bool ThermoCouple::getStatus(TCStatus &status)
+bool ThermoCouple::getStatus(TCStatus &status) const
 {  
-  if (!this->readRegister(TCRegister::Status, 1)) return false;
+  if (!readRegister(TCRegister::Status, 1)) return false;
   status.status = Wire.read();
   return true;
 };
@@ -77,9 +77,9 @@ bool ThermoCouple::getStatus(TCStatus &status)
 /// Clear Status
 /// </summary>
 /// <returns>Clear status. Returns true on success, false on failure</returns>
-bool ThermoCouple::clearStatus()
+bool ThermoCouple::clearStatus() const
 {  
-  return this->writeRegister(TCRegister::Status, 0);
+  return writeRegister(TCRegister::Status, 0);
 };
 
 /// <summary>
@@ -87,9 +87,9 @@ bool ThermoCouple::clearStatus()
 /// </summary>
 /// <param name="id"></param>
 /// <returns>True on success</returns>
-bool ThermoCouple::getDeviceID(byte &id)
+bool ThermoCouple::getDeviceID(byte &id) const
 {
-  if (!this->readRegister(TCRegister::DeviceID, 1)) return false;
+  if (!readRegister(TCRegister::DeviceID, 1)) return false;
   id = Wire.read();
   return true;
 }
@@ -146,9 +146,9 @@ bool ThermoCouple::getTemperature(float& temperature)
 /// </summary>
 /// <param name="temperature">Return measured temperature</param>
 /// <returns>Returns true on success</returns>
-bool ThermoCouple::getTemperatureRegister(int &temperature)
+bool ThermoCouple::getTemperatureRegister(int &temperature) const
 {
-    if (!this->readRegister(TCRegister::THigh, 2)) return false;
+    if (!readRegister(TCRegister::THigh, 2)) return false;
     temperature = (Wire.read()<<8) | Wire.read();
     return true;
 }
@@ -160,7 +160,7 @@ bool ThermoCouple::getTemperatureRegister(int &temperature)
 /// <returns>True on success</returns>
 bool ThermoCouple::getColdJunctionTemperature(int &temperature) const
 {
-    if (!this->readRegister(TCRegister::TCold, 2)) return false;
+    if (!readRegister(TCRegister::TCold, 2)) return false;
     temperature = (Wire.read()<<8) | Wire.read();
     return true;
 }
@@ -170,7 +170,7 @@ bool ThermoCouple::getColdJunctionTemperature(int &temperature) const
 /// </summary>
 bool ThermoCouple::writeRegister(TCRegister reg, byte value) const
 {
-  Wire.beginTransmission(this->address);   // talk to TC 
+  Wire.beginTransmission(_address);   // talk to TC 
   Wire.write((byte) reg);   
   Wire.write(value);
   return Wire.endTransmission(true) == 0;  // send stop
@@ -181,8 +181,8 @@ bool ThermoCouple::writeRegister(TCRegister reg, byte value) const
 /// </summary>
 bool ThermoCouple::readRegister(TCRegister reg, int count) const
 {
-  Wire.beginTransmission(this->address);   // talk to TC
+  Wire.beginTransmission(_address);   // talk to TC
   Wire.write((byte) reg);   // status register
   Wire.endTransmission(true);             // send stop
-  return (Wire.requestFrom((uint8_t)this->address, (uint8_t)count) == count);
+  return (Wire.requestFrom((uint8_t)_address, (uint8_t)count) == count);
 };

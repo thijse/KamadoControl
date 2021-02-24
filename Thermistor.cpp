@@ -31,14 +31,6 @@ bool Thermistor::setupAndStartADC()
         Log.errorln(F("Error configuring ADC (%02X)"), _adcConfig.config);
         return false;
     }
-    else
-    {
-        if (!_adc->readConfiguration(_adcConfig))
-        {
-            Log.errorln(F("Error reading ADC configuration"));
-            return false;
-        }
-    }
     return true;
 };
 
