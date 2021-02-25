@@ -1,6 +1,5 @@
 #include "Screen.h"
 
-
 void Screen::updateRequest(UpdateType updateType)
 {
     _updateType = max(_updateType, updateType);

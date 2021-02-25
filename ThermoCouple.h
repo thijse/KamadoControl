@@ -39,15 +39,14 @@ enum class TCThermoCoupleType : byte
     Mask     = 0x70
 };
 
-
 // Status
 struct TCStatus {
     public:
       byte status;
 
       bool burstComplete() { return (status&128) != 0; };
-      bool openCircuit()   { return (status&32 ) != 0; };
-      bool shortCircuit()  { return (status&16 ) != 0; };   
+      bool openCircuit  () { return (status&32 ) != 0; };
+      bool shortCircuit () { return (status&16 ) != 0; };   
 };
 
 
@@ -57,16 +56,15 @@ struct TCDeviceConfig {
       byte config;
 
       TCColdJunctionResolution coldJunctionResolution() const                          { return (TCColdJunctionResolution) (config & (byte) TCColdJunctionResolution::Mask);};
-      TCMeasurementResolution  measurementResolution() const                           { return (TCMeasurementResolution)  (config & (byte) TCMeasurementResolution::Mask );};
-      TCShutdownMode           shutdownMode() const                                    { return (TCShutdownMode)           (config & (byte) TCShutdownMode::Mask          );};
-      byte                     burstModeSamples() const                                { return                           ((config & 0x1C) >> 2) + 1                       ;};
+      TCMeasurementResolution  measurementResolution()  const                          { return (TCMeasurementResolution)  (config & (byte) TCMeasurementResolution::Mask );};
+      TCShutdownMode           shutdownMode()           const                          { return (TCShutdownMode)           (config & (byte) TCShutdownMode::Mask          );};
+      byte                     burstModeSamples()       const                          { return                           ((config & 0x1C) >> 2) + 1                       ;};
 
       void                     setBurstModeSamples(byte count)                         { config = (config & (~0x1C))                                  | ((count - 1) << 2); };
       void                     setColdJunctionResolution(TCColdJunctionResolution res) { config = (config & (~(byte) TCColdJunctionResolution::Mask)) | (byte) res;         };
       void                     setMeasurementResolution(TCMeasurementResolution res)   { config = (config & (~(byte) TCMeasurementResolution::Mask))  | (byte) res;         };
       void                     setShutdownMode(TCShutdownMode mode)                    { config = (config & (~(byte) TCShutdownMode::Mask))           | (byte) mode;        };
 };
-
 
 // Sensor configuration
 struct TCSensorConfig {
@@ -80,8 +78,6 @@ struct TCSensorConfig {
       void setThermoCoupleType(TCThermoCoupleType tc) { config = (config & (~(byte) TCThermoCoupleType::Mask)) | (byte) tc; };
 };
 
-
-
 // Registers
 enum class TCRegister : byte
 {
@@ -92,8 +88,7 @@ enum class TCRegister : byte
     Status              = 4,
     SensorConfiguration = 5,
     DeviceConfiguration = 6,
-    DeviceID            = 32
-    
+    DeviceID            = 32    
 };
 
 

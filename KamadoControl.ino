@@ -68,29 +68,29 @@ void setup() {
     System::PowerSafeMode();
 
     // Initialize display
-    display.init(); // 
-    display.setRotation(3);
+    display.init         ();  
+    display.setRotation  (3);
     display.setFullWindow();
-    display.fillScreen(GxEPD_WHITE);
-    display.setTextColor(GxEPD_BLACK);
-    display.setFont(&FreeMonoBold9pt7b);
-    display.setCursor(0, 0);
+    display.fillScreen   (GxEPD_WHITE);
+    display.setTextColor (GxEPD_BLACK);
+    display.setFont      (&FreeMonoBold9pt7b);
+    display.setCursor    (0, 0);
 
     // Initialize UI elements
-    battery.init();
-    timer  .init();
+    battery       .init();
+    timer         .init();
     setTemperature.init();
-    //logo   .init();
-    //sdcard .init(&sdSPI);
+    //logo        .init();
+    //sdcard      .init(&sdSPI);
 
     // Draw UI elements
-    display.fillScreen(GxEPD_WHITE);
-    battery.draw();
-    timer  .draw();
+    display       .fillScreen(GxEPD_WHITE);
+    battery       .draw();
+    timer         .draw();
     setTemperature.draw();
-    //logo   .draw();
-    //sdcard .draw();
-    display.display(false); // full update
+    //logo        .draw();
+    //sdcard      .draw();
+    display       .display(false); // full update
 
     xTaskCreatePinnedToCore(
         taskMain
@@ -128,12 +128,12 @@ void taskMain(void* pvParameters)
     {
         Log.traceln(F("loop %d"),loopCounter++);
         (void)pvParameters;
-        battery.update();
-        timer  .update();
+        battery       .update();
+        timer         .update();
         setTemperature.update();
-       //logo   .update();
-        //sdcard .update();
-        display.update(); // Update the screen depending on update requests.
+        //logo        .update();
+        //sdcard      .update();
+        display       .update(); // Update the screen depending on update requests.
 
         measureControl.SetTargetTemperature(setTemperature.getTargetTemperature());
         //setTemperature.setCurrentTemperature();

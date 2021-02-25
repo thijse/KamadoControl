@@ -1,7 +1,6 @@
 #include <Wire.h>
 #include "ADC.h"
 
-
 // Constructor: _address is I2C address
 ADC::ADC(byte address) 
 {
@@ -40,7 +39,6 @@ bool ADC::reset()
   Wire.write((byte)ADCCommand::Reset);  
   return (Wire.endTransmission(true) == 0);
 }
-
 
 // Start a single or continuous conversion (depending on configuration register). Also 'reverses' shutdown.
 bool ADC::start()

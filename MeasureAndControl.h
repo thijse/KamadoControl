@@ -22,7 +22,7 @@ public:
 class MeasureAndControl
 {
 private:
-    PID_v2 pidControl;
+    PID_v2      pidControl;
     ADC          adc;
     ThermoCouple thermo1;
     ThermoCouple thermo2;

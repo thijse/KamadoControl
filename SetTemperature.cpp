@@ -2,7 +2,7 @@
 #include <Fonts/FreeMonoBold24pt7b.h>
 #include <Fonts/FreeMonoBold18pt7b.h>
 #include "Fonts/FreeSansBold32pt7b.h"
-//
+
 SetTemperature* pointerToSetTemperature = nullptr;
 
 SetTemperature::SetTemperature(Screen* display) :

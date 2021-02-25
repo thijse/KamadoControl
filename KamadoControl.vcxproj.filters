@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -16,50 +8,21 @@
     <Filter Include="Fonts">
       <UniqueIdentifier>{7de018a7-978a-42a7-939d-d696e6d666c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{f4f61ec5-6b68-40a2-a499-034a0e0bc275}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{e96580b3-b844-476c-8fc2-ad8b780dec02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TemperatureControl">
+      <UniqueIdentifier>{606a7c6c-9647-4e7d-9c6e-d3243643a74e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="KamadoControl.ino" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.KamadoControl.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AutoResetEvent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Battery.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Logo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Screen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDCard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SetTemperature.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="System.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TripleBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ThermoCouple.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MeasureAndControl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="State.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Fonts\FreeSansBold8pt7b.h">
       <Filter>Fonts</Filter>
     </ClInclude>
@@ -75,55 +38,94 @@
     <ClInclude Include="Fonts\FreeSansBold32pt7b.h">
       <Filter>Fonts</Filter>
     </ClInclude>
+    <ClInclude Include="Logo.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCard.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Battery.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="SetTemperature.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoResetEvent.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="TripleBuffer.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>System</Filter>
+    </ClInclude>
     <ClInclude Include="RotaryEncoder.h">
-      <Filter>Header Files</Filter>
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Screen.h">
+      <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="ADC.h">
-      <Filter>Header Files</Filter>
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="ThermoCouple.h">
+      <Filter>TemperatureControl</Filter>
     </ClInclude>
     <ClInclude Include="Thermistor.h">
-      <Filter>Header Files</Filter>
+      <Filter>TemperatureControl</Filter>
+    </ClInclude>
+    <ClInclude Include="MeasureAndControl.h">
+      <Filter>TemperatureControl</Filter>
+    </ClInclude>
+    <ClInclude Include="__vm\.KamadoControl.vsarduino.h">
+      <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Battery.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="logo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Screen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SDCard.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="SetTemperature.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="System.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="ThermoCouple.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MeasureAndControl.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SDCard.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="Constants.h">
-      <Filter>Header Files</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="RotaryEncoder.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="ADC.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Screen.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="MeasureAndControl.cpp">
+      <Filter>TemperatureControl</Filter>
     </ClCompile>
     <ClCompile Include="Thermistor.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>TemperatureControl</Filter>
+    </ClCompile>
+    <ClCompile Include="ThermoCouple.cpp">
+      <Filter>TemperatureControl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

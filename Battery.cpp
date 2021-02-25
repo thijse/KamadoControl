@@ -44,9 +44,7 @@ void Battery::update()
 {
     int voltage = getVoltage();
     // Draw percentage lines
-    int barLength    = (int)((getVoltage() - _vMin) * _vToBarSlope);
-    
-    
+    int barLength    = (int)((getVoltage() - _vMin) * _vToBarSlope);        
     int remainLength = _width-barLength- 2;
     bool changed     = barLength != _prevBarLength;
     _display->fillRect(_posX+1          , _posY+2, barLength   , _height-4, GxEPD_BLACK); // black bar
