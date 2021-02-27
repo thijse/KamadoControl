@@ -91,25 +91,29 @@ class ADC {
   private:
       byte _address;
       
-  public:  
-  // Constructor
-  ADC(byte _address);
-  // Destructor
-  ~ADC();
+  public:
 
-  // Set configuration
-  bool configure(ADCConfig ac);
-  // read current configuration
-  bool readConfiguration(ADCConfig &result);
-  // Reset device
-  bool reset();
-  // Start a single or continuous conversion (depending on configuration register)
-  bool start();
-  // Power down. Start() can start a conversion from power down
-  bool powerDown();
-// Test whether a new ADC conversion is ready. Flag is reset after reading value!
-  bool conversionReady(bool &result);
-  // read conversion value
-  bool read(int16_t &value);
+      ADC(const ADC& other)            = delete;
+      ADC& operator=(const ADC& other) = delete;
+
+      // Constructor
+      ADC(byte _address);
+      // Destructor
+      ~ADC();
+
+      // Set configuration
+      bool configure(ADCConfig ac);
+      // read current configuration
+      bool readConfiguration(ADCConfig &result);
+      // Reset device
+      bool reset();
+      // Start a single or continuous conversion (depending on configuration register)
+      bool start();
+      // Power down. Start() can start a conversion from power down
+      bool powerDown();
+     // Test whether a new ADC conversion is ready. Flag is reset after reading value.
+      bool conversionReady(bool &result);
+      // read conversion value
+      bool read(int16_t &value);
 };
 

@@ -26,8 +26,7 @@ private:
     ADC          adc;
     ThermoCouple thermo1;
     ThermoCouple thermo2;
-    Thermistor   thermistor1;
-    Thermistor   thermistor2;
+    Thermistor   thermistor;
     TripleBuffer<MeasurementData> measurements;
     State<float> targetTemperature;
     static void ConfigureThermoSensor(ThermoCouple& thermo);
@@ -40,6 +39,6 @@ public:
     void update();
     MeasurementData* GetMeasurements();
     static float ReadTemperature(ThermoCouple& thermo);
-    static float ReadTemperature(Thermistor& thermistor);
+
     void SetTargetTemperature(float targetTemp);
 };

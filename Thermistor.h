@@ -3,8 +3,18 @@
 #include "ADC.h"
 #include "ArduinoLog.h"
 
+struct ThermistorsResult
+{
+    float temperature[4]{};
+    bool success     [4]{};
+};
 
-// Class doing the work
+struct ThermistorResult
+{
+    float temperature;
+    bool success;
+};
+
 class Thermistor {
       
   public:
@@ -12,17 +22,18 @@ class Thermistor {
       Thermistor& operator=(const Thermistor& other) = delete;
 
       // Constructor
-      Thermistor(ADC *adc,uint8_t channel);
+      Thermistor(ADC &adc);
       // Destructor
       ~Thermistor();
-      // Setup and start ADC
-      bool setupAndStartADC();      
-      // Get temperature in degrees
-      bool getTemperature(float &temperature);
-     
+      ThermistorsResult readTemperature();
+      ThermistorResult  readTemperature(byte channel);
+      bool              readTemperature(byte channel, float& value);            
+
   private:
-      ADC      *_adc;
-      uint8_t   _channel;
-      ADCConfig _adcConfig{};
+      ADC              &_adc;
+      uint8_t           _channel;
+      ADCConfig         _adcConfig{};
+      bool              setupChannel(byte channel);
+      float             adcToTemperature(uint8_t adcValue);
 };
 

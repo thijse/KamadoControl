@@ -6,8 +6,7 @@ MeasureAndControl::MeasureAndControl() :
     adc        (0x40   ),
     thermo1    (0x60   ),
     thermo2    (0x60   ),
-    thermistor1(&adc, 0),
-    thermistor2(&adc, 1)
+    thermistor (adc    )
 {
     ConfigureThermoSensor(thermo1);
     ConfigureThermoSensor(thermo2);    
@@ -33,8 +32,10 @@ void MeasureAndControl::update()
     MeasurementData* measurement   = measurements.getWriteBuffer();
     measurement->Temperature[0]    = ReadTemperature(thermo1    );
     measurement->Temperature[1]    = ReadTemperature(thermo2    );
-    measurement->Temperature[2]    = ReadTemperature(thermistor1);
-    measurement->Temperature[3]    = ReadTemperature(thermistor2);
+    ThermistorResult  result2      = thermistor.readTemperature(2);
+    ThermistorResult  result3      = thermistor.readTemperature(3);
+    measurement->Temperature[2]    = result2.temperature;
+    measurement->Temperature[3]    = result3.temperature;
     measurement->targetTemperature = targetTemp;
     measurements.releaseWriteBuffer();
 
@@ -73,18 +74,6 @@ float MeasureAndControl::ReadTemperature(ThermoCouple& thermoCouple)
     if (!success)
     {
         Log.errorln(F("Failed reading thermocouple"));
-        return 0;
-    }
-    return temperature;
-}
-
-float MeasureAndControl::ReadTemperature(Thermistor& thermistor)
-{
-    float temperature;
-    const bool success = thermistor.getTemperature(temperature);
-    if (!success)
-    {
-        Log.errorln(F("Failed reading thermistor"));
         return 0;
     }
     return temperature;

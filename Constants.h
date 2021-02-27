@@ -7,6 +7,12 @@
 #define ARDUINO_RUNNING_CORE 1
 #endif
 
+// output pins
+#define O_RELAY                   25
+#define O_5V                      27
+#define O_A0                      5
+#define O_A1                      4
+
 // I2C pins
 #define I2C_SDA                   21
 #define I2C_SCL                   22

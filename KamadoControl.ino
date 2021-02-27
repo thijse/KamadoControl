@@ -51,14 +51,22 @@ void taskMeasureAndControl(void* pvParameters);
 void setup() {
 
     // initialize serial communication at 115200 bits per second:
-    Wire.setClock(100000L);
+    Wire.setClock(10000L);
+
+
+    // Select I2C channel 1
+    pinMode(O_A0, OUTPUT);
+    pinMode(O_A1, OUTPUT);
+    digitalWrite(O_A0, 1);
+    digitalWrite(O_A1, 0);
     Wire.begin(I2C_SDA, I2C_SCL);
 
     Serial.begin(115200);
     while (!Serial && !Serial.available()) {}
     Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
-    Log.traceln(F("setup KamadoControl"));
+    
+
     loopCounter  = 0;
 
     SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI, ELINK_SS);
