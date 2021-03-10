@@ -5,9 +5,10 @@
 /// Initialize Thermocouple
 /// </summary>
 /// <param name="address">I2C Address</param>
-ThermoCouple::ThermoCouple(uint8_t address)
+ThermoCouple::ThermoCouple(uint8_t address, SemaphoreHandle_t* mutex) :
+ _address(address),
+ _mutex  (mutex)
 {
-  _address = address;
 };
 
 /// <summary>
@@ -67,10 +68,17 @@ bool ThermoCouple::setDeviceConfiguration(TCDeviceConfig &config) const
 /// <param name="status">Returns thermocouple status</param>
 /// <returns>True on success, false on failure</returns> 
 bool ThermoCouple::getStatus(TCStatus &status) const
-{  
-  if (!readRegister(TCRegister::Status, 1)) return false;
-  status.status = Wire.read();
-  return true;
+{
+    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    {
+        if (!readRegister(TCRegister::Status, 1)) {
+            xSemaphoreGive(*_mutex);
+            return false;
+        }
+        status.status = Wire.read();      
+        xSemaphoreGive(*_mutex);
+    }
+    return true;
 };
 
 /// <summary>
@@ -78,8 +86,14 @@ bool ThermoCouple::getStatus(TCStatus &status) const
 /// </summary>
 /// <returns>Clear status. Returns true on success, false on failure</returns>
 bool ThermoCouple::clearStatus() const
-{  
-  return writeRegister(TCRegister::Status, 0);
+{
+    bool result;
+    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    {
+        result = writeRegister(TCRegister::Status, 0);
+        xSemaphoreGive(*_mutex);
+    }
+    return result;
 };
 
 /// <summary>
@@ -89,9 +103,16 @@ bool ThermoCouple::clearStatus() const
 /// <returns>True on success</returns>
 bool ThermoCouple::getDeviceID(byte &id) const
 {
-  if (!readRegister(TCRegister::DeviceID, 1)) return false;
-  id = Wire.read();
-  return true;
+    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    {
+        if (!readRegister(TCRegister::DeviceID, 1)) {
+            xSemaphoreGive(*_mutex);
+            return false;
+        }
+        id = Wire.read();
+        xSemaphoreGive(*_mutex);
+    }
+    return true;
 }
 
 bool ThermoCouple::readTemperature(float& temperature)
@@ -153,8 +174,16 @@ void ThermoCouple::readTemperature(int no, TemperatureResults& temperatureResult
 /// <returns>Returns true on success</returns>
 bool ThermoCouple::getTemperatureRegister(int &temperature) const
 {
-    if (!readRegister(TCRegister::THigh, 2)) return false;
-    temperature = (Wire.read()<<8) | Wire.read();
+
+    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    {
+        if (!readRegister(TCRegister::THigh, 2)) {
+            xSemaphoreGive(*_mutex);
+            return false;
+        }
+        temperature = (Wire.read() << 8) | Wire.read();
+        xSemaphoreGive(*_mutex);
+    }
     return true;
 }
   
@@ -165,8 +194,15 @@ bool ThermoCouple::getTemperatureRegister(int &temperature) const
 /// <returns>True on success</returns>
 bool ThermoCouple::getColdJunctionTemperature(int &temperature) const
 {
-    if (!readRegister(TCRegister::TCold, 2)) return false;
-    temperature = (Wire.read()<<8) | Wire.read();
+    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    {
+        if (!readRegister(TCRegister::TCold, 2)) {
+            xSemaphoreGive(*_mutex);
+            return false;
+        }
+        temperature = (Wire.read() << 8) | Wire.read();
+        xSemaphoreGive(*_mutex);
+    }
     return true;
 }
 
@@ -175,10 +211,16 @@ bool ThermoCouple::getColdJunctionTemperature(int &temperature) const
 /// </summary>
 bool ThermoCouple::writeRegister(TCRegister reg, byte value) const
 {
-  Wire.beginTransmission(_address);   // talk to TC 
-  Wire.write((byte) reg);   
-  Wire.write(value);
-  return Wire.endTransmission(true) == 0;  // send stop
+    bool result;
+    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    {
+        Wire.beginTransmission(_address);   // talk to TC 
+        Wire.write((byte)reg);
+        Wire.write(value);
+        result = ( Wire.endTransmission(true) == 0);  // send stop
+        xSemaphoreGive(*_mutex);
+    }
+    return result;
 };  
 
 /// <summary>
@@ -186,8 +228,16 @@ bool ThermoCouple::writeRegister(TCRegister reg, byte value) const
 /// </summary>
 bool ThermoCouple::readRegister(TCRegister reg, int count) const
 {
-  Wire.beginTransmission(_address);   // talk to TC
-  Wire.write((byte) reg);   // status register
-  Wire.endTransmission(true);             // send stop
-  return (Wire.requestFrom((uint8_t)_address, (uint8_t)count) == count);
+    bool result;
+    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    {
+        Wire.beginTransmission(_address);   // talk to TC
+        Wire.write((byte)reg);   // status register
+        Wire.endTransmission(true);             // send stop
+        result =(Wire.requestFrom((uint8_t)_address, (uint8_t)count) == count);
+        xSemaphoreGive(*_mutex);
+    }
+    return result;
+
+
 };

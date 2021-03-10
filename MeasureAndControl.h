@@ -23,7 +23,7 @@ public:
 class MeasureAndControl
 {
 private:
-    PID_v2      pidControl;
+    PID_v2       pidControl;
     ADC          adc;
     ThermoCouple thermo1;
     ThermoCouple thermo2;
@@ -36,8 +36,7 @@ private:
 public:
     MeasureAndControl(const MeasureAndControl& other)            = delete;
     MeasureAndControl& operator=(const MeasureAndControl& other) = delete;
-    void init(QueueHandle_t *mutex);
-    MeasureAndControl();
+    MeasureAndControl(SemaphoreHandle_t *mutex);
     ~MeasureAndControl();
     void update();
     MeasurementData* GetMeasurements();

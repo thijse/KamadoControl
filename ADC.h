@@ -89,15 +89,16 @@ struct ADCConfig {
 // Class doing the work
 class ADC {
   private:
-      byte _address;
-      
+      byte           _address;
+      QueueHandle_t* _mutex;
+      bool writeByte(byte value);
   public:
 
       ADC           (const ADC& other) = delete;
       ADC& operator=(const ADC& other) = delete;
 
       // Constructor
-      ADC(byte _address);
+      ADC(byte _address, SemaphoreHandle_t* mutex);
       // Destructor
       ~ADC();
 

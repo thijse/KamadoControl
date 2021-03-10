@@ -96,14 +96,15 @@ enum class TCRegister : byte
 // Class doing the work
 class ThermoCouple {
   private:
-      uint8_t _address;
+      uint8_t        _address;
+      QueueHandle_t* _mutex;
       
   public:
       ThermoCouple(const ThermoCouple& other)            = delete;
       ThermoCouple& operator=(const ThermoCouple& other) = delete;
 
       // Constructor
-      ThermoCouple(uint8_t address);
+      ThermoCouple(uint8_t address, SemaphoreHandle_t* mutex);
       // Destructor
       ~ThermoCouple();
       // Get status

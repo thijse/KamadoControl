@@ -5,6 +5,7 @@
 // Test if initialization before setup works
 // Move to constructor
 // Move into ThermoCouple & Thermistor + ADC
+// try remove pointer to mutex (is a void pointer in itself)
 
 #include <ArduinoLog.h>
 #include "WiFi.h" 
@@ -37,11 +38,11 @@
 #include <Fonts/FreeMonoBold24pt7b.h>
 
 
-SemaphoreHandle_t wireMutex; // = xSemaphoreCreateMutex();
-Screen            display(ELINK_SS, ELINK_DC, ELINK_RESET, ELINK_BUSY);
+SemaphoreHandle_t wireMutex = xSemaphoreCreateMutex();
+Screen            display(&wireMutex,ELINK_SS, ELINK_DC, ELINK_RESET, ELINK_BUSY);
 SPIClass          sdSPI(VSPI);
 
-MeasureAndControl measureControl;
+MeasureAndControl measureControl(&wireMutex);
 
 Battery           battery(&display, BATTERY_PIN);
 Timer             timer  (&display);
@@ -75,14 +76,14 @@ void setup() {
 
     loopCounter  = 0;
 
-    SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI, ELINK_SS);
+    SPI.begin  (SPI_CLK   , SPI_MISO   , SPI_MOSI   , ELINK_SS);
     sdSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_SS);
 
     // Settings to reduce power consumption
     System::PowerSafeMode();
 
     // Initialize display
-    display.init         (&wireMutex);
+    display.init         ();
     display.setRotation  (3);
     display.setFullWindow();
     display.fillScreen   (GxEPD_WHITE);
@@ -90,8 +91,6 @@ void setup() {
     display.setFont      (&FreeMonoBold9pt7b);
     display.setCursor    (0, 0);
 
-    // Initialize measurements
-    measureControl.init(&wireMutex);
 
     // Initialize UI elements
     battery       .init();

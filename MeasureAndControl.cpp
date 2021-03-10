@@ -1,16 +1,13 @@
 #include "MeasureAndControl.h"
 #include "ArduinoLog.h"
 
-void MeasureAndControl::init(QueueHandle_t *mutex)
-{
-    _mutex = mutex;
-}
 
-MeasureAndControl::MeasureAndControl() :
+MeasureAndControl::MeasureAndControl(SemaphoreHandle_t *mutex) :
+    _mutex(mutex),
     pidControl(2, 5, 1, PID::Direct, PID::P_On::Measurement),
-    adc        (0x40   ),
-    thermo1    (0x60   ),
-    thermo2    (0x60   ),
+    adc        (0x40, mutex),
+    thermo1    (0x60, mutex),
+    thermo2    (0x60, mutex),
     thermistor (adc    )
 {
     ConfigureThermoSensor(thermo1);
@@ -35,13 +32,10 @@ void MeasureAndControl::update()
 
     // Todo: more fine grained lock
     MeasurementData* measurement = measurements.getWriteBuffer();
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
-    {
-        thermo1   .readTemperature(0, measurement->temperatureResults);
-        thermo1   .readTemperature(1, measurement->temperatureResults);
-        thermistor.readTemperature(2, measurement->temperatureResults);        
-        xSemaphoreGive(*_mutex);
-    }
+    thermo1   .readTemperature(0, measurement->temperatureResults);
+    thermo1   .readTemperature(1, measurement->temperatureResults);
+    thermistor.readTemperature(2, measurement->temperatureResults);        
+
 
     measurement->targetTemperature = targetTemp;
     measurements.releaseWriteBuffer();

@@ -29,8 +29,7 @@ void Screen::update()
 	_updateType = UpdateType::none;
 }
 
-void Screen::init(SemaphoreHandle_t *mutex, uint32_t serial_diag_bitrate)
+void Screen::init(uint32_t serial_diag_bitrate)
 {
-	_mutex = mutex;
 	GxEPD2_BW<GxEPD2_213_B72, GxEPD2_213_B72::HEIGHT>::init(serial_diag_bitrate);
 }
