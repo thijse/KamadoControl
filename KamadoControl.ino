@@ -1,6 +1,11 @@
 // https://savjee.be/2019/12/esp32-tips-to-increase-battery-life/
 // https://www.robmiles.com/journal/2020/1/20/disabling-the-esp32-brownout-detector
 
+// todo _wireMutex:
+// Test if initialization before setup works
+// Move to constructor
+// Move into ThermoCouple & Thermistor + ADC
+
 #include <ArduinoLog.h>
 #include "WiFi.h" 
 #include "driver/adc.h"
@@ -32,8 +37,9 @@
 #include <Fonts/FreeMonoBold24pt7b.h>
 
 
-Screen display(ELINK_SS, ELINK_DC, ELINK_RESET, ELINK_BUSY);
-SPIClass sdSPI(VSPI);
+SemaphoreHandle_t wireMutex; // = xSemaphoreCreateMutex();
+Screen            display(ELINK_SS, ELINK_DC, ELINK_RESET, ELINK_BUSY);
+SPIClass          sdSPI(VSPI);
 
 MeasureAndControl measureControl;
 
@@ -51,8 +57,8 @@ void taskMeasureAndControl(void* pvParameters);
 void setup() {
 
     // initialize serial communication at 115200 bits per second:
-    Wire.setClock(10000L);
-
+    Wire.setClock(1000L);
+   wireMutex = xSemaphoreCreateMutex();
 
     // Select I2C channel 1
     pinMode(O_A0, OUTPUT);
@@ -65,7 +71,7 @@ void setup() {
     while (!Serial && !Serial.available()) {}
     Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
-    
+    Serial.print("Kamado Code Multi thread - main thread UI");
 
     loopCounter  = 0;
 
@@ -76,13 +82,16 @@ void setup() {
     System::PowerSafeMode();
 
     // Initialize display
-    display.init         ();  
+    display.init         (&wireMutex);
     display.setRotation  (3);
     display.setFullWindow();
     display.fillScreen   (GxEPD_WHITE);
     display.setTextColor (GxEPD_BLACK);
     display.setFont      (&FreeMonoBold9pt7b);
     display.setCursor    (0, 0);
+
+    // Initialize measurements
+    measureControl.init(&wireMutex);
 
     // Initialize UI elements
     battery       .init();
@@ -123,6 +132,7 @@ void setup() {
 void loop()
 {
     // Empty. Things are done in Tasks.
+
 }
 
 /*---------------------- Tasks ---------------------*/
@@ -134,8 +144,7 @@ void taskMain(void* pvParameters)
 
     for (;;) // A Task shall never return or exit.
     {
-        Log.traceln(F("loop %d"),loopCounter++);
-        (void)pvParameters;
+        //Log.traceln(F("loop %d"),loopCounter++);
         battery       .update();
         timer         .update();
         setTemperature.update();
@@ -144,18 +153,22 @@ void taskMain(void* pvParameters)
         display       .update(); // Update the screen depending on update requests.
 
         measureControl.SetTargetTemperature(setTemperature.getTargetTemperature());
-        //setTemperature.setCurrentTemperature();
-
-
+        
         MeasurementData* data = measureControl.GetMeasurements();
         if (data != nullptr) {
-            Serial.print("Temperature 0     : ")  ; Serial.println(data->Temperature[0]);
-            Serial.print("Temperature 1     : ")  ; Serial.println(data->Temperature[1]);
-            Serial.print("Temperature 2     : ")  ; Serial.println(data->Temperature[2]);
-            Serial.print("Temperature 3     : ")  ; Serial.println(data->Temperature[3]);
-            Serial.print("Target Temperature: ")  ; Serial.println(data->targetTemperature);
+            Serial.print("Temperature 0x    : ") ; if (data->temperatureResults.success[0]) Serial.println(data->temperatureResults.temperature[0]); else Serial.println("--:--");
+            Serial.print("Temperature 1     : ") ; if (data->temperatureResults.success[1]) Serial.println(data->temperatureResults.temperature[1]); else Serial.println("--:--");
+            Serial.print("Temperature 2     : ") ; if (data->temperatureResults.success[2]) Serial.println(data->temperatureResults.temperature[2]); else Serial.println("--:--");
+            Serial.print("Temperature 3     : ") ; if (data->temperatureResults.success[3]) Serial.println(data->temperatureResults.temperature[3]); else Serial.println("--:--");
+            Serial.print("Temperature 4     : ") ; if (data->temperatureResults.success[4]) Serial.println(data->temperatureResults.temperature[4]); else Serial.println("--:--");
+            Serial.print("Temperature 5     : ") ; if (data->temperatureResults.success[5]) Serial.println(data->temperatureResults.temperature[5]); else Serial.println("--:--");
+            Serial.print("Target Temperature: ") ; Serial.println(data->targetTemperature);
+
+            setTemperature.setCurrentTemperature(data->temperatureResults.temperature[5]);
         }
-        vTaskDelay(10 / portTICK_PERIOD_MS); // wait for one second
+        
+
+        vTaskDelay(50 / portTICK_PERIOD_MS); 
     }
 }
 
@@ -165,7 +178,7 @@ void taskMeasureAndControl(void* pvParameters)  // This is a task.
 
     for (;;)
     {
-        measureControl.update();        
+        measureControl.update();
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }

@@ -4,7 +4,7 @@
 class AutoResetEvent
 {
 public:
-	AutoResetEvent(const AutoResetEvent& other)            = delete;
+	AutoResetEvent           (const AutoResetEvent& other) = delete;
 	AutoResetEvent& operator=(const AutoResetEvent& other) = delete;
 
 	/// <summary>

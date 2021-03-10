@@ -1,7 +1,5 @@
 #pragma once
-
 #include "arduino.h"
-
 #include <GxEPD2_GFX.h>
 #include <GxEPD2_EPD.h>
 #include <GxEPD2_BW.h>
@@ -19,7 +17,7 @@ protected:
 
 	const static unsigned char lilygo[];
 public:
-	Logo(const Logo& other)            = delete;
+	Logo           (const Logo& other) = delete;
 	Logo& operator=(const Logo& other) = delete;
 	Logo(Screen* display);
 	void init();

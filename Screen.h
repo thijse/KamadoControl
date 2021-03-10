@@ -1,4 +1,5 @@
 #pragma once
+#include "arduino.h"
 #include <GxEPD2_BW.h>
 
 #define ELINK_SS     5
@@ -16,13 +17,19 @@ class Screen : public GxEPD2_BW<GxEPD2_213_B72, GxEPD2_213_B72::HEIGHT>
             full    = 2,
         };
     private:
-        UpdateType _updateType;
-    public:
+        UpdateType    _updateType;
+        QueueHandle_t *_mutex;
+    public:        
+        Screen           (const Screen& other) = delete;        
+        Screen& operator=(const Screen& other) = delete;
+
         Screen(int8_t cs, int8_t dc, int8_t rst, int8_t busy) :
-            GxEPD2_BW<GxEPD2_213_B72, GxEPD2_213_B72::HEIGHT>(GxEPD2_213_B72(cs, dc, rst, busy)), _updateType(UpdateType::none)
+            GxEPD2_BW<GxEPD2_213_B72, GxEPD2_213_B72::HEIGHT>(GxEPD2_213_B72(cs, dc, rst, busy)),
+            _updateType(UpdateType::none)
         {
         };
         void updateRequest(UpdateType updateType);
         void update();
+        void init(SemaphoreHandle_t *mutex, uint32_t serial_diag_bitrate = 0);
 };
 

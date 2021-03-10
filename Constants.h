@@ -44,7 +44,6 @@
 #define ROTARY_ENCODER_VCC_PIN    -1 /*put -1 of Rotary encoder Vcc is connected directly to 3,3V; else you can use declared output pin for powering rotary encoder */
 
 
-
 class Const
 {
 public:

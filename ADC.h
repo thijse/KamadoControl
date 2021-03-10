@@ -93,7 +93,7 @@ class ADC {
       
   public:
 
-      ADC(const ADC& other)            = delete;
+      ADC           (const ADC& other) = delete;
       ADC& operator=(const ADC& other) = delete;
 
       // Constructor

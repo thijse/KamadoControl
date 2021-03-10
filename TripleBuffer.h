@@ -5,7 +5,7 @@ template <class T>
 class TripleBuffer
 {
 public:
-	TripleBuffer(const TripleBuffer& other)            = delete;			
+	TripleBuffer           (const TripleBuffer& other) = delete;			
 	TripleBuffer& operator=(const TripleBuffer& other) = delete;
 
 	TripleBuffer() : 
@@ -17,7 +17,7 @@ public:
 		_mutex = xSemaphoreCreateMutex();
 	}
 	~TripleBuffer() {
-		if (xSemaphoreTake(_mutex, (TickType_t)0))
+		if (xSemaphoreTake(_mutex, (TickType_t)100))
 		{
 			_readIndex   = -1;
 			_writeIndex  = -1;
@@ -72,8 +72,8 @@ public:
 	/// Release the buffer to write in. Do this always after GetNewReadBuffer.
 	/// </summary>
 	void releaseWriteBuffer()
-	{
-		if (xSemaphoreTake(_mutex, (TickType_t)0))
+	{		
+		if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
 		{
 			_newIndex    = _writeIndex;
 			_isNewBuffer = true;

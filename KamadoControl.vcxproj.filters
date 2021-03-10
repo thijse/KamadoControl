@@ -86,6 +86,12 @@
     <ClInclude Include="Fonts\FreeSansBold32pt7b.h">
       <Filter>Fonts</Filter>
     </ClInclude>
+    <ClInclude Include="ThermistorConversion.h">
+      <Filter>TemperatureControl</Filter>
+    </ClInclude>
+    <ClInclude Include="TemperatureResults.h">
+      <Filter>TemperatureControl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Battery.cpp">
@@ -122,6 +128,9 @@
       <Filter>TemperatureControl</Filter>
     </ClCompile>
     <ClCompile Include="ThermoCouple.cpp">
+      <Filter>TemperatureControl</Filter>
+    </ClCompile>
+    <ClCompile Include="ThermistorConversion.cpp">
       <Filter>TemperatureControl</Filter>
     </ClCompile>
   </ItemGroup>

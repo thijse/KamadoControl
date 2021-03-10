@@ -1,7 +1,6 @@
 // Time
 #pragma once 
 #include "arduino.h"
-
 #include <GxEPD2_GFX.h>
 #include <GxEPD2_EPD.h>
 #include <GxEPD2_BW.h>
@@ -21,6 +20,8 @@ protected:
 	unsigned long _time_start_ms;
 	char          _prevTime[6];
 public:
+	Timer           (const Timer& other) = delete;
+	Timer& operator=(const Timer& other) = delete;
 	Timer(Screen* display);
 	void init();
 	void update();

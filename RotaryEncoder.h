@@ -43,7 +43,10 @@ private:
 	int8_t            _encStates[16] = {0,-1,1,0,1,0,0,-1,-1,0,0,1,0,1,-1,0};
 	void(*_ISRCallback)();
 
-public: 
+public:
+	RotaryEncoder           (const RotaryEncoder& other) = delete;
+	RotaryEncoder& operator=(const RotaryEncoder& other) = delete;
+
 	RotaryEncoder(
 		uint8_t encoderAPin      = RotaryEncoder_DEFAULT_A_PIN,
 		uint8_t encoderBPin      = RotaryEncoder_DEFAULT_B_PIN,

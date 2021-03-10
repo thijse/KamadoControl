@@ -1,7 +1,6 @@
 // Battery
 #pragma once 
 #include "arduino.h"
-
 #include <GxEPD2_GFX.h>
 #include <GxEPD2_EPD.h>
 #include <GxEPD2_BW.h>
@@ -27,7 +26,7 @@ class Battery
 		int           _prevBarLength;
 
 	public:
-		Battery(const Battery& other) = delete;
+		Battery           (const Battery& other) = delete;
 		Battery& operator=(const Battery& other) = delete;
 		Battery(
 			Screen* display,

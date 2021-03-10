@@ -10,12 +10,13 @@
 #include "ThermoCouple.h"
 #include "TripleBuffer.h"
 #include "State.h"
+#include "TemperatureResults.h"
 #include "Thermistor.h"
 
 
 struct MeasurementData {
 public:
-    float Temperature[4];
+    TemperatureResults temperatureResults;
     float targetTemperature;
 };
 
@@ -29,11 +30,13 @@ private:
     Thermistor   thermistor;
     TripleBuffer<MeasurementData> measurements;
     State<float> targetTemperature;
+    QueueHandle_t *_mutex;
     static void ConfigureThermoSensor(ThermoCouple& thermo);
     static void setServo(float servoTarget);
 public:
     MeasureAndControl(const MeasureAndControl& other)            = delete;
     MeasureAndControl& operator=(const MeasureAndControl& other) = delete;
+    void init(QueueHandle_t *mutex);
     MeasureAndControl();
     ~MeasureAndControl();
     void update();

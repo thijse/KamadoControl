@@ -7,7 +7,8 @@
 /// <param name="adc">ADC to be used</param>
 /// <param name="channel">Channel on ADC to use</param>
 Thermistor::Thermistor(ADC &adc) :
-    _adc(adc)
+    _adc(adc),
+    _conversion(3.3, 3.3, 65535)
 {    
 };
 
@@ -33,28 +34,20 @@ float Thermistor::adcToTemperature(uint8_t adcValue)
 {
 }
 
-ThermistorResult Thermistor::readTemperature(byte channel)
+void Thermistor::readTemperature(int no, TemperatureResults &temperatureResults)
 {
-    ThermistorResult thermistorResult;    
-    thermistorResult.success = readTemperature(channel, thermistorResult.temperature);
-    return thermistorResult;
-}
-
-
-ThermistorsResult Thermistor::readTemperature()
-{
-    ThermistorsResult thermistorsResult;   
-
+    
+    // Use last 4 slots (2..5)
     for (byte channel = 0; channel < 4; channel++)
     {
-        thermistorsResult.success[channel] = readTemperature(channel, thermistorsResult.temperature[channel]);
+        temperatureResults.success[channel+ no] = readTemperature(channel, temperatureResults.temperature[channel+ no]);
     }
 
     if (!_adc.powerDown())
     {
         Log.warningln(F("Error placing ADC in shutdown mode"));
     }
-    return thermistorsResult;
+    return;
 }
 
 bool Thermistor::readTemperature(byte channel, float& temperature)
@@ -66,7 +59,7 @@ bool Thermistor::readTemperature(byte channel, float& temperature)
         Log.warningln(F("Error starting conversion"));
         return false;
     }
-    vTaskDelay(11.0 / portTICK_PERIOD_MS); // should be just enough to finish conversion
+    vTaskDelay(12.0 / portTICK_PERIOD_MS); // should be just enough to finish conversion
     
     do
     {
@@ -86,6 +79,9 @@ bool Thermistor::readTemperature(byte channel, float& temperature)
         Log.warningln(F("Error reading conversion value"));
         return false;
     }
-    temperature = (float)value;
+    temperature = _conversion.getTempCelsius(value);
     return true;
 }
+
+
+

@@ -94,7 +94,7 @@ bool ThermoCouple::getDeviceID(byte &id) const
   return true;
 }
 
-bool ThermoCouple::getTemperature(float& temperature)
+bool ThermoCouple::readTemperature(float& temperature)
 {
     int n       = 0;
     temperature = 0;
@@ -112,11 +112,11 @@ bool ThermoCouple::getTemperature(float& temperature)
     else
     {
         TCStatus stat{};
-        delay(110);
-        for (n = 0; n < 2; n++)
+        vTaskDelay(120.0 / portTICK_PERIOD_MS); // should be just enough to finish conversion
+        for (n = 0; n < 3; n++)
         {
             if (!getStatus(stat) || stat.burstComplete()) break;
-            delay(10);
+            vTaskDelay(10);
         }
         if (!stat.burstComplete())
         {
@@ -139,6 +139,11 @@ bool ThermoCouple::getTemperature(float& temperature)
         }
     }
     return false;
+}
+
+void ThermoCouple::readTemperature(int no, TemperatureResults& temperatureResults)
+{
+    temperatureResults.success[no] = readTemperature(temperatureResults.temperature[no]);
 }
 
 /// <summary>

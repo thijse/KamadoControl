@@ -1,7 +1,6 @@
 // Time
 #pragma once 
 #include "arduino.h"
-
 #include <SD.h>
 #include <SPI.h>
 #include "Screen.h"
@@ -16,7 +15,7 @@ protected:
 	int         _posY;
 	int		    _prevCardSize;
 public:
-	SDCard(const SDCard& other) = delete;
+	SDCard           (const SDCard& other) = delete;
 	SDCard& operator=(const SDCard& other) = delete;
 	SDCard(
 		Screen* display,

@@ -9,17 +9,17 @@ SetTemperature::SetTemperature(Screen* display) :
     _display(display),
     _posX(25), _posY(80),
     _x(0), _y(0), _w(0),_h(0),
-    _temp(20)
+    _rotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN),
+    _currentTemperature(20.0f),
+    _targetTemperature(20)
 {
-    Serial.print("SetTemperature:ctor");
-    _rotaryEncoder = RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN);
     if (pointerToSetTemperature!=nullptr)
     {
         Log.errorln(F("Already a SetTemperature class instantiated. There can be only one "));
         return; // throw;
     }
      pointerToSetTemperature = this;
-    _rotaryEncoder.reset        (_temp);
+    _rotaryEncoder.reset        (_targetTemperature);
     _rotaryEncoder.setup        ([] {pointerToSetTemperature->_rotaryEncoder.readEncoder_ISR(); });
     _rotaryEncoder.setBoundaries(0, 400, false);
     _rotaryEncoder.begin        ();
@@ -43,7 +43,11 @@ void SetTemperature::update()
     _display->setCursor    (_posX, _posY);
     _display->fillRect     (_x, _y, _w, _h, GxEPD_WHITE);
     _display->setCursor    (_posX, _posY);
-    _display->print        (_temp);
+    _display->print        (_targetTemperature);
+    _display->setCursor(_posX+100, _posY);
+    _display->fillRect(_x+100, _y, _w+20, _h, GxEPD_WHITE);
+    _display->setCursor(_posX+100, _posY);
+    _display->print(_currentTemperature,1);
     _display->updateRequest(Screen::partial);
 }
 
@@ -59,7 +63,7 @@ void SetTemperature::rotaryInput() {
 	//optionally we can ignore whenever there is no change
 	if (encoderDelta == 0) return;
 
-    _temp = _rotaryEncoder.readEncoder();
+    _targetTemperature = _rotaryEncoder.readEncoder();
 }
 
 void SetTemperature::draw()
@@ -70,5 +74,10 @@ void SetTemperature::draw()
 
 int16_t SetTemperature::getTargetTemperature() const
 {
-    return _temp;
+    return _targetTemperature;
+}
+
+void SetTemperature::setCurrentTemperature(float currentTemperature)
+{
+    _currentTemperature = currentTemperature;
 }

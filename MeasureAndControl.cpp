@@ -1,6 +1,11 @@
 #include "MeasureAndControl.h"
 #include "ArduinoLog.h"
 
+void MeasureAndControl::init(QueueHandle_t *mutex)
+{
+    _mutex = mutex;
+}
+
 MeasureAndControl::MeasureAndControl() :
     pidControl(2, 5, 1, PID::Direct, PID::P_On::Measurement),
     adc        (0x40   ),
@@ -28,20 +33,22 @@ void MeasureAndControl::update()
 {
     const float targetTemp = targetTemperature.get();
 
-    // Todo: store per measurement status (success, failure)
-    MeasurementData* measurement   = measurements.getWriteBuffer();
-    measurement->Temperature[0]    = ReadTemperature(thermo1    );
-    measurement->Temperature[1]    = ReadTemperature(thermo2    );
-    ThermistorResult  result2      = thermistor.readTemperature(2);
-    ThermistorResult  result3      = thermistor.readTemperature(3);
-    measurement->Temperature[2]    = result2.temperature;
-    measurement->Temperature[3]    = result3.temperature;
+    // Todo: more fine grained lock
+    MeasurementData* measurement = measurements.getWriteBuffer();
+    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    {
+        thermo1   .readTemperature(0, measurement->temperatureResults);
+        thermo1   .readTemperature(1, measurement->temperatureResults);
+        thermistor.readTemperature(2, measurement->temperatureResults);        
+        xSemaphoreGive(*_mutex);
+    }
+
     measurement->targetTemperature = targetTemp;
     measurements.releaseWriteBuffer();
 
     pidControl.Setpoint(targetTemp);
-    const float servoTarget = (float)pidControl.Run(measurement->Temperature[0]);
-    setServo(servoTarget);
+    const float servoTarget = (float)pidControl.Run(measurement->temperatureResults.temperature[3]);
+    setServo(servoTarget);   
 }
 
 void MeasureAndControl::setServo(float servoTarget)
@@ -70,7 +77,7 @@ void MeasureAndControl::ConfigureThermoSensor(ThermoCouple& thermo)
 float MeasureAndControl::ReadTemperature(ThermoCouple& thermoCouple)
 {
     float temperature;
-    const bool success = thermoCouple.getTemperature(temperature);
+    const bool success = thermoCouple.readTemperature(temperature);
     if (!success)
     {
         Log.errorln(F("Failed reading thermocouple"));

@@ -10,7 +10,7 @@ class System
 {
     protected:
 public:
-    System(const System& other)            = delete;
+    System           (const System& other) = delete;
     System& operator=(const System& other) = delete;
     static void printBootReason();
     static void PowerSafeMode();

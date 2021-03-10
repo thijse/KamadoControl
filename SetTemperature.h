@@ -6,12 +6,10 @@
 #include "RotaryEncoder.h"
 #include "Screen.h"
 
-
-
 class SetTemperature
 {
 protected:
-	Screen* _display;
+	Screen*  _display;
 	int                  _posX;
 	int                  _posY;
 	int16_t              _x{};
@@ -19,17 +17,20 @@ protected:
 	uint16_t             _w{};
 	uint16_t             _h{};
 	
-	int16_t              _temp;
+	int16_t              _targetTemperature;
+	float                _currentTemperature;
 
 public:
-	SetTemperature(const SetTemperature& other) = delete;
+	SetTemperature           (const SetTemperature& other) = delete;
 	SetTemperature& operator=(const SetTemperature& other) = delete;
-	SetTemperature(Screen* display);
+    
+    SetTemperature(Screen* display);
 	
 	RotaryEncoder _rotaryEncoder;
-	void init();
-	void update();
-    void rotaryInput();
-    void draw();
-	int16_t getTargetTemperature() const;
+	void init                    ();
+	void update                  ();
+    void rotaryInput             ();
+    void draw                    ();
+	int16_t getTargetTemperature () const;
+	void    setCurrentTemperature(float currentTemperature);
 };

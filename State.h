@@ -10,7 +10,7 @@ template <class T>
 class State
 {
 public:
-    State(const State& other) = delete;
+    State           (const State& other) = delete;
     State& operator=(const State& other) = delete;
 
     State() : _mutex(nullptr), _pending(false)
@@ -19,7 +19,7 @@ public:
     }
 
     void set(T& value) {
-        if (xSemaphoreTake(_mutex, (TickType_t)0))
+        if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
         {
             _value   = value;
             _pending = true;
@@ -27,7 +27,7 @@ public:
         }
     }
     void get(T& value) {
-        if (xSemaphoreTake(_mutex, (TickType_t)0))
+        if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
         {
             value = _value;
             _pending = false;
@@ -42,7 +42,7 @@ public:
 
     T get() {
         T value;
-        if (xSemaphoreTake(_mutex, (TickType_t)0))
+        if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
         {
             value = _value;
             xSemaphoreGive(_mutex);

@@ -1,5 +1,6 @@
 #pragma once 
 #include "arduino.h"
+#include "TemperatureResults.h"
 #include "ArduinoLog.h"
 
 enum class TCShutdownMode : byte
@@ -111,8 +112,10 @@ class ThermoCouple {
       // Get ID and version
       bool getDeviceID(byte &id) const;
       // Read temperature multiple times
-      bool getTemperature(float& temperature);
+      bool readTemperature(float& temperature);
       // Get temperature in 1/16th degrees
+      void readTemperature(int no, TemperatureResults& temperatureResults);
+
       bool getTemperatureRegister(int &temperature) const;
       // Get cold junction temperature
       bool getColdJunctionTemperature(int &temperature) const;
