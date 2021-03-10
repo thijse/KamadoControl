@@ -18,12 +18,12 @@ class Screen : public GxEPD2_BW<GxEPD2_213_B72, GxEPD2_213_B72::HEIGHT>
         };
     private:
         UpdateType    _updateType;
-        QueueHandle_t *_mutex;
+        QueueHandle_t _mutex;
     public:        
         Screen           (const Screen& other) = delete;        
         Screen& operator=(const Screen& other) = delete;
 
-        Screen(SemaphoreHandle_t *mutex, int8_t cs, int8_t dc, int8_t rst, int8_t busy) :
+        Screen(SemaphoreHandle_t mutex, int8_t cs, int8_t dc, int8_t rst, int8_t busy) :
             _mutex(mutex),
             GxEPD2_BW<GxEPD2_213_B72, GxEPD2_213_B72::HEIGHT>(GxEPD2_213_B72(cs, dc, rst, busy)),
             _updateType(UpdateType::none)

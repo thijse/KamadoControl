@@ -29,14 +29,14 @@ private:
     Thermistor                    _thermistor;
     TripleBuffer<MeasurementData> _measurements;
     State<float>                  _targetTemperature;
-    SemaphoreHandle_t            *_mutex;
+    SemaphoreHandle_t             _mutex;
     static void configureThermoSensor(ThermoCouple& thermo);
     static void setServo             (float servoTarget);
     void        powerCycleBoard      ();
 public:
     MeasureAndControl                (const MeasureAndControl& other)            = delete;
     MeasureAndControl& operator=     (const MeasureAndControl& other) = delete;
-    MeasureAndControl                (SemaphoreHandle_t *mutex);
+    MeasureAndControl                (SemaphoreHandle_t mutex);
     ~MeasureAndControl               ();
     void update                      ();
     MeasurementData* getMeasurements ();

@@ -1,12 +1,6 @@
 // https://savjee.be/2019/12/esp32-tips-to-increase-battery-life/
 // https://www.robmiles.com/journal/2020/1/20/disabling-the-esp32-brownout-detector
 
-// todo _wireMutex:
-// Test if initialization before setup works
-// Move to constructor
-// Move into ThermoCouple & Thermistor + ADC
-// try remove pointer to mutex (is a void pointer in itself)
-
 #include <ArduinoLog.h>
 #include "WiFi.h" 
 #include "driver/adc.h"
@@ -39,10 +33,10 @@
 
 
 SemaphoreHandle_t wireMutex = xSemaphoreCreateMutex();
-Screen            display(&wireMutex,ELINK_SS, ELINK_DC, ELINK_RESET, ELINK_BUSY);
+Screen            display(wireMutex,ELINK_SS, ELINK_DC, ELINK_RESET, ELINK_BUSY);
 SPIClass          sdSPI(VSPI);
 
-MeasureAndControl measureControl(&wireMutex);
+MeasureAndControl measureControl(wireMutex);
 
 Battery           battery(&display, BATTERY_PIN);
 Timer             timer  (&display);
@@ -59,7 +53,6 @@ void setup() {
 
     // initialize serial communication at 115200 bits per second:
     Wire.setClock(1000L);
-    //wireMutex = xSemaphoreCreateMutex();
 
     // Turn on measurement board
     pinMode(O_33V, OUTPUT);

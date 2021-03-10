@@ -2,7 +2,7 @@
 #include "ArduinoLog.h"
 
 
-MeasureAndControl::MeasureAndControl(SemaphoreHandle_t *mutex) :
+MeasureAndControl::MeasureAndControl(SemaphoreHandle_t mutex) :
     _mutex(mutex),
     _pidControl(2, 5, 1, PID::Direct, PID::P_On::Measurement),
     _adc        (0x40, mutex),

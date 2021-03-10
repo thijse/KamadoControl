@@ -8,7 +8,7 @@ void Screen::updateRequest(UpdateType updateType)
 void Screen::update()
 {
 
-	if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+	if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
 	{
 	    switch (_updateType)
 	    {
@@ -24,7 +24,7 @@ void Screen::update()
 	    default:
 		    break;
 	    }
-	    xSemaphoreGive(*_mutex);
+	    xSemaphoreGive(_mutex);
 	}
 	_updateType = UpdateType::none;
 }

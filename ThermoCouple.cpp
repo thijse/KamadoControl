@@ -5,7 +5,7 @@
 /// Initialize Thermocouple
 /// </summary>
 /// <param name="address">I2C Address</param>
-ThermoCouple::ThermoCouple(uint8_t address, SemaphoreHandle_t* mutex) :
+ThermoCouple::ThermoCouple(uint8_t address, SemaphoreHandle_t mutex) :
  _address(address),
  _mutex  (mutex)
 {
@@ -27,10 +27,10 @@ bool ThermoCouple::getSensorConfiguration(TCSensorConfig &config) const
 {
   if (!readRegister(TCRegister::SensorConfiguration, 1)) return false;
 
-  if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+  if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
   {
       config.config = Wire.read();
-      xSemaphoreGive(*_mutex);
+      xSemaphoreGive(_mutex);
   }
     
   return true;
@@ -54,10 +54,10 @@ bool ThermoCouple::setSensorConfiguration(TCSensorConfig &config) const
 bool ThermoCouple::getDeviceConfiguration(TCDeviceConfig &config) const
 {
   if (!readRegister(TCRegister::DeviceConfiguration, 1)) return false;
-  if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+  if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
   {
       config.config = Wire.read();
-      xSemaphoreGive(*_mutex);
+      xSemaphoreGive(_mutex);
   }
   
   return true;
@@ -82,10 +82,10 @@ bool ThermoCouple::getStatus(TCStatus &status) const
 {
     if (!readRegister(TCRegister::Status, 1)) return false;
    
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         status.status = Wire.read();      
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return true;
 };
@@ -107,14 +107,14 @@ bool ThermoCouple::clearStatus() const
 /// <returns>True on success</returns>
 bool ThermoCouple::getDeviceID(byte &id) const
 {
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         if (!readRegister(TCRegister::DeviceID, 1)) {
-            xSemaphoreGive(*_mutex);
+            xSemaphoreGive(_mutex);
             return false;
         }
         id = Wire.read();
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return true;
 }
@@ -182,10 +182,10 @@ bool ThermoCouple::getTemperatureRegister(int &temperature) const
 
     if (!readRegister(TCRegister::THigh, 2)) return false;
 
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         temperature = (Wire.read() << 8) | Wire.read();
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return true;
 }
@@ -199,10 +199,10 @@ bool ThermoCouple::getColdJunctionTemperature(int &temperature) const
 {
     if (!readRegister(TCRegister::TCold, 2)) return false;
 
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         temperature = (Wire.read() << 8) | Wire.read();
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return true;
 }
@@ -213,13 +213,13 @@ bool ThermoCouple::getColdJunctionTemperature(int &temperature) const
 bool ThermoCouple::writeRegister(TCRegister reg, byte value) const
 {
     bool result;
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         Wire.beginTransmission(_address);   // talk to TC 
         Wire.write((byte)reg);
         Wire.write(value);
         result = ( Wire.endTransmission(true) == 0);  // send stop
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return result;
 };  
@@ -231,13 +231,13 @@ bool ThermoCouple::readRegister(TCRegister reg, int count) const
 {
     
     bool result;
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         Wire.beginTransmission(_address);   // talk to TC
         Wire.write((byte)reg);   // status register
         Wire.endTransmission(true);             // send stop
         result =(Wire.requestFrom((uint8_t)_address, (uint8_t)count) == count);
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return result;
 

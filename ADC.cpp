@@ -2,7 +2,7 @@
 #include "ADC.h"
 
 // Constructor: _address is I2C address
-ADC::ADC(byte address, SemaphoreHandle_t* mutex) :
+ADC::ADC(byte address, SemaphoreHandle_t mutex) :
     _address(address),
     _mutex  (mutex)
 {
@@ -15,13 +15,13 @@ ADC::~ADC(){  };
 bool ADC::configure(ADCConfig ac)
 {
     bool result;
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         Wire.beginTransmission(_address);
         Wire.write((byte)ADCCommand::WriteConfigurationRegister);
         Wire.write((byte)ac.config);
         result = Wire.endTransmission(true) == 0;
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return result;
 }
@@ -29,17 +29,17 @@ bool ADC::configure(ADCConfig ac)
 // Test whether a new ADC conversion is ready. Flag is reset after reading value!
 bool ADC::readConfiguration(ADCConfig &result)
 {
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         Wire.beginTransmission(_address);
         Wire.write((byte)ADCCommand::ReadConfigurationRegister);
         if (Wire.endTransmission(false) != 0 || Wire.requestFrom(_address, (byte)1) != 1)
         {
-            xSemaphoreGive(*_mutex);
+            xSemaphoreGive(_mutex);
             return false;
         }
         result.config = Wire.read();
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return true;
 }
@@ -66,17 +66,17 @@ bool ADC::powerDown()
 bool ADC::conversionReady(bool &result)
 {
 
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         Wire.beginTransmission(_address);
         Wire.write((byte)ADCCommand::ReadStatusRegister);
         if (Wire.endTransmission(false) != 0 || Wire.requestFrom(_address, (byte)1) != 1)
         {
-            xSemaphoreGive(*_mutex);
+            xSemaphoreGive(_mutex);
             return false;
         }
         result = (Wire.read() & 0x80) != 0;
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return true;
 }
@@ -84,17 +84,17 @@ bool ADC::conversionReady(bool &result)
 // read conversion value
 bool ADC::read(int16_t &value)
 {
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         Wire.beginTransmission(_address);
         Wire.write((byte)ADCCommand::ReadData);
         if (Wire.endTransmission(false) != 0 || Wire.requestFrom(_address, (byte)2) != 2)
         {
-            xSemaphoreGive(*_mutex);
+            xSemaphoreGive(_mutex);
             return false;
         }
         value = (Wire.read() << 8) + Wire.read();
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     } 
     return true;
 }
@@ -102,12 +102,12 @@ bool ADC::read(int16_t &value)
 bool ADC::writeByte(byte value)
 {
     bool result;
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+    if (xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY))
     {
         Wire.beginTransmission(_address);
         Wire.write((byte)value);
         result = Wire.endTransmission(true) == 0;
-        xSemaphoreGive(*_mutex);
+        xSemaphoreGive(_mutex);
     }
     return result;
 }

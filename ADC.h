@@ -90,7 +90,7 @@ struct ADCConfig {
 class ADC {
   private:
       byte           _address;
-      SemaphoreHandle_t* _mutex;
+      SemaphoreHandle_t _mutex;
       bool writeByte(byte value);
   public:
 
@@ -98,7 +98,7 @@ class ADC {
       ADC& operator=(const ADC& other) = delete;
 
       // Constructor
-      ADC(byte _address, SemaphoreHandle_t* mutex);
+      ADC(byte _address, SemaphoreHandle_t mutex);
       // Destructor
       ~ADC();
 
