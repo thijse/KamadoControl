@@ -26,7 +26,13 @@ ThermoCouple::~ThermoCouple()
 bool ThermoCouple::getSensorConfiguration(TCSensorConfig &config) const
 {
   if (!readRegister(TCRegister::SensorConfiguration, 1)) return false;
-  config.config = Wire.read();
+
+  if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+  {
+      config.config = Wire.read();
+      xSemaphoreGive(*_mutex);
+  }
+    
   return true;
 };
 
@@ -48,7 +54,12 @@ bool ThermoCouple::setSensorConfiguration(TCSensorConfig &config) const
 bool ThermoCouple::getDeviceConfiguration(TCDeviceConfig &config) const
 {
   if (!readRegister(TCRegister::DeviceConfiguration, 1)) return false;
-  config.config = Wire.read();
+  if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
+  {
+      config.config = Wire.read();
+      xSemaphoreGive(*_mutex);
+  }
+  
   return true;
 }
 
@@ -69,12 +80,10 @@ bool ThermoCouple::setDeviceConfiguration(TCDeviceConfig &config) const
 /// <returns>True on success, false on failure</returns> 
 bool ThermoCouple::getStatus(TCStatus &status) const
 {
+    if (!readRegister(TCRegister::Status, 1)) return false;
+   
     if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
     {
-        if (!readRegister(TCRegister::Status, 1)) {
-            xSemaphoreGive(*_mutex);
-            return false;
-        }
         status.status = Wire.read();      
         xSemaphoreGive(*_mutex);
     }
@@ -88,12 +97,7 @@ bool ThermoCouple::getStatus(TCStatus &status) const
 bool ThermoCouple::clearStatus() const
 {
     bool result;
-    if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
-    {
-        result = writeRegister(TCRegister::Status, 0);
-        xSemaphoreGive(*_mutex);
-    }
-    return result;
+    return writeRegister(TCRegister::Status, 0);    
 };
 
 /// <summary>
@@ -125,6 +129,7 @@ bool ThermoCouple::readTemperature(float& temperature)
     config.setBurstModeSamples     (1);
     config.setMeasurementResolution(TCMeasurementResolution::Bit16);
 
+    
     if (!clearStatus() || !setDeviceConfiguration(config))
     {
         Log.errorln(F("Failed starting conversion"));
@@ -175,12 +180,10 @@ void ThermoCouple::readTemperature(int no, TemperatureResults& temperatureResult
 bool ThermoCouple::getTemperatureRegister(int &temperature) const
 {
 
+    if (!readRegister(TCRegister::THigh, 2)) return false;
+
     if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
     {
-        if (!readRegister(TCRegister::THigh, 2)) {
-            xSemaphoreGive(*_mutex);
-            return false;
-        }
         temperature = (Wire.read() << 8) | Wire.read();
         xSemaphoreGive(*_mutex);
     }
@@ -194,12 +197,10 @@ bool ThermoCouple::getTemperatureRegister(int &temperature) const
 /// <returns>True on success</returns>
 bool ThermoCouple::getColdJunctionTemperature(int &temperature) const
 {
+    if (!readRegister(TCRegister::TCold, 2)) return false;
+
     if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
     {
-        if (!readRegister(TCRegister::TCold, 2)) {
-            xSemaphoreGive(*_mutex);
-            return false;
-        }
         temperature = (Wire.read() << 8) | Wire.read();
         xSemaphoreGive(*_mutex);
     }
@@ -228,6 +229,7 @@ bool ThermoCouple::writeRegister(TCRegister reg, byte value) const
 /// </summary>
 bool ThermoCouple::readRegister(TCRegister reg, int count) const
 {
+    
     bool result;
     if (xSemaphoreTake(*_mutex, (TickType_t)portMAX_DELAY))
     {

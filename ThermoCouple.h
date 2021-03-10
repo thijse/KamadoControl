@@ -96,8 +96,8 @@ enum class TCRegister : byte
 // Class doing the work
 class ThermoCouple {
   private:
-      uint8_t        _address;
-      QueueHandle_t* _mutex;
+      uint8_t            _address;
+      SemaphoreHandle_t* _mutex;
       
   public:
       ThermoCouple(const ThermoCouple& other)            = delete;

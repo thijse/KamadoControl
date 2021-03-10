@@ -9,9 +9,9 @@ SetTemperature::SetTemperature(Screen* display) :
     _display(display),
     _posX(25), _posY(80),
     _x(0), _y(0), _w(0),_h(0),
-    _rotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN),
-    _currentTemperature(20.0f),
-    _targetTemperature(20)
+    _rotaryEncoder      (ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN),
+    _currentTemperature (20.0f),
+    _targetTemperature  (20)
 {
     if (pointerToSetTemperature!=nullptr)
     {
@@ -44,10 +44,10 @@ void SetTemperature::update()
     _display->fillRect     (_x, _y, _w, _h, GxEPD_WHITE);
     _display->setCursor    (_posX, _posY);
     _display->print        (_targetTemperature);
-    _display->setCursor(_posX+100, _posY);
-    _display->fillRect(_x+100, _y, _w+20, _h, GxEPD_WHITE);
-    _display->setCursor(_posX+100, _posY);
-    _display->print(_currentTemperature,1);
+    _display->setCursor    (_posX+100, _posY); // todo: make font dependent
+    _display->fillRect     (_x+100, _y, _w+20, _h, GxEPD_WHITE);
+    _display->setCursor    (_posX+100, _posY);
+    _display->print        (_currentTemperature,1);
     _display->updateRequest(Screen::partial);
 }
 

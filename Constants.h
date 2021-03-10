@@ -8,10 +8,10 @@
 #endif
 
 // output pins
-#define O_RELAY                   25
-#define O_5V                      27
-#define O_A0                      5
-#define O_A1                      4
+#define O_33V                     19
+#define O_50V1                    26
+#define O_50V2                    25
+#define O_PWM1                    14
 
 // I2C pins
 #define I2C_SDA                   21

@@ -49,8 +49,8 @@ Timer             timer  (&display);
 SetTemperature    setTemperature(&display);
 //Logo              logo   (&display);
 //SDCard            sdcard (&display, SDCARD_SS);
-int               loopCounter;
-
+int               uiLoopCounter;
+int               measureLoopCounter;
 
 void taskMain(void* pvParameters);
 void taskMeasureAndControl(void* pvParameters);
@@ -59,22 +59,26 @@ void setup() {
 
     // initialize serial communication at 115200 bits per second:
     Wire.setClock(1000L);
-   wireMutex = xSemaphoreCreateMutex();
+    //wireMutex = xSemaphoreCreateMutex();
 
-    // Select I2C channel 1
-    pinMode(O_A0, OUTPUT);
-    pinMode(O_A1, OUTPUT);
-    digitalWrite(O_A0, 1);
-    digitalWrite(O_A1, 0);
+    // Turn on measurement board
+    pinMode(O_33V, OUTPUT);
+    //pinMode(O_50V1, OUTPUT);
+    //pinMode(O_50V2, OUTPUT);
+    digitalWrite(O_33V, 1);
+    //digitalWrite(O_50V1, 1);
+    //digitalWrite(O_50V2, 1);
     Wire.begin(I2C_SDA, I2C_SCL);
 
     Serial.begin(115200);
     while (!Serial && !Serial.available()) {}
     Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
-    Serial.print("Kamado Code Multi thread - main thread UI");
+    Serial.println("Kamado Code Multi thread - fine lock");
+    Serial.println();
 
-    loopCounter  = 0;
+    uiLoopCounter      = 0;
+    measureLoopCounter = 0;
 
     SPI.begin  (SPI_CLK   , SPI_MISO   , SPI_MOSI   , ELINK_SS);
     sdSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_SS);
@@ -143,7 +147,7 @@ void taskMain(void* pvParameters)
 
     for (;;) // A Task shall never return or exit.
     {
-        //Log.traceln(F("loop %d"),loopCounter++);
+       // Log.traceln(F("ui loop %d"),uiLoopCounter++);
         battery       .update();
         timer         .update();
         setTemperature.update();
@@ -151,11 +155,11 @@ void taskMain(void* pvParameters)
         //sdcard      .update();
         display       .update(); // Update the screen depending on update requests.
 
-        measureControl.SetTargetTemperature(setTemperature.getTargetTemperature());
+        measureControl.setTargetTemperature(setTemperature.getTargetTemperature());
         
-        MeasurementData* data = measureControl.GetMeasurements();
+        MeasurementData* data = measureControl.getMeasurements();
         if (data != nullptr) {
-            Serial.print("Temperature 0x    : ") ; if (data->temperatureResults.success[0]) Serial.println(data->temperatureResults.temperature[0]); else Serial.println("--:--");
+            Serial.print("Temperature 0     : ") ; if (data->temperatureResults.success[0]) Serial.println(data->temperatureResults.temperature[0]); else Serial.println("--:--");
             Serial.print("Temperature 1     : ") ; if (data->temperatureResults.success[1]) Serial.println(data->temperatureResults.temperature[1]); else Serial.println("--:--");
             Serial.print("Temperature 2     : ") ; if (data->temperatureResults.success[2]) Serial.println(data->temperatureResults.temperature[2]); else Serial.println("--:--");
             Serial.print("Temperature 3     : ") ; if (data->temperatureResults.success[3]) Serial.println(data->temperatureResults.temperature[3]); else Serial.println("--:--");
@@ -177,6 +181,7 @@ void taskMeasureAndControl(void* pvParameters)  // This is a task.
 
     for (;;)
     {
+        Log.traceln(F("measure loop %d"), measureLoopCounter++);
         measureControl.update();
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }

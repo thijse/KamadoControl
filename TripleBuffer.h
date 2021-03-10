@@ -87,9 +87,7 @@ public:
 		}
 	}
 
-private:
-	
-    	
+private:   	
 	int8_t            _readIndex;
 	int8_t            _writeIndex;
 	int8_t            _newIndex;

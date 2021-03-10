@@ -4,16 +4,16 @@
 
 MeasureAndControl::MeasureAndControl(SemaphoreHandle_t *mutex) :
     _mutex(mutex),
-    pidControl(2, 5, 1, PID::Direct, PID::P_On::Measurement),
-    adc        (0x40, mutex),
-    thermo1    (0x60, mutex),
-    thermo2    (0x60, mutex),
-    thermistor (adc    )
+    _pidControl(2, 5, 1, PID::Direct, PID::P_On::Measurement),
+    _adc        (0x40, mutex),
+    _thermo1    (0x60, mutex),
+    _thermo2    (0x60, mutex),
+    _thermistor (_adc    )
 {
-    ConfigureThermoSensor(thermo1);
-    ConfigureThermoSensor(thermo2);    
+    configureThermoSensor(_thermo1);
+    configureThermoSensor(_thermo2);    
 
-    pidControl.Start(
+    _pidControl.Start(
         20.0f,    // input
         0,        // current output
         20.0f);   // set-point
@@ -28,20 +28,20 @@ MeasureAndControl::~MeasureAndControl()
 /// </summary>
 void MeasureAndControl::update()
 {
-    const float targetTemp = targetTemperature.get();
+    const float targetTemp = _targetTemperature.get();
 
     // Todo: more fine grained lock
-    MeasurementData* measurement = measurements.getWriteBuffer();
-    thermo1   .readTemperature(0, measurement->temperatureResults);
-    thermo1   .readTemperature(1, measurement->temperatureResults);
-    thermistor.readTemperature(2, measurement->temperatureResults);        
+    MeasurementData* measurement = _measurements.getWriteBuffer();
+    _thermo1   .readTemperature(0, measurement->temperatureResults);
+    _thermo1   .readTemperature(1, measurement->temperatureResults);
+    _thermistor.readTemperature(2, measurement->temperatureResults);        
 
 
     measurement->targetTemperature = targetTemp;
-    measurements.releaseWriteBuffer();
+    _measurements.releaseWriteBuffer();
 
-    pidControl.Setpoint(targetTemp);
-    const float servoTarget = (float)pidControl.Run(measurement->temperatureResults.temperature[3]);
+    _pidControl.Setpoint(targetTemp);
+    const float servoTarget = (float)_pidControl.Run(measurement->temperatureResults.temperature[3]);
     setServo(servoTarget);   
 }
 
@@ -50,16 +50,21 @@ void MeasureAndControl::setServo(float servoTarget)
     // todo set servo
 }
 
+void MeasureAndControl::powerCycleBoard()
+{
+
+}
+
 /// <summary>
 ///  Returns buffered measurement data. Will return nullptr if no new data since last request.
 /// </summary>
 /// <returns></returns>
-MeasurementData* MeasureAndControl::GetMeasurements()
+MeasurementData* MeasureAndControl::getMeasurements()
 {
-    return measurements.getNewReadBuffer();
+    return _measurements.getNewReadBuffer();
 }
 
-void MeasureAndControl::ConfigureThermoSensor(ThermoCouple& thermo)
+void MeasureAndControl::configureThermoSensor(ThermoCouple& thermo)
 {
     TCSensorConfig sensorConfig{};
     sensorConfig.setFilterCoefficients(0);
@@ -68,7 +73,7 @@ void MeasureAndControl::ConfigureThermoSensor(ThermoCouple& thermo)
     if (!thermo.setSensorConfiguration(sensorConfig)) {Log.errorln("Failed setting sensor configuration"); } else { Log.noticeln("Sensor configured"); }
 }
 
-float MeasureAndControl::ReadTemperature(ThermoCouple& thermoCouple)
+float MeasureAndControl::readTemperature(ThermoCouple& thermoCouple)
 {
     float temperature;
     const bool success = thermoCouple.readTemperature(temperature);
@@ -80,7 +85,7 @@ float MeasureAndControl::ReadTemperature(ThermoCouple& thermoCouple)
     return temperature;
 }
 
-void MeasureAndControl::SetTargetTemperature(float targetTemp)
+void MeasureAndControl::setTargetTemperature(float targetTemp)
 {
-    targetTemperature.set(targetTemp);
+    _targetTemperature.set(targetTemp);
 }

@@ -90,7 +90,7 @@ struct ADCConfig {
 class ADC {
   private:
       byte           _address;
-      QueueHandle_t* _mutex;
+      SemaphoreHandle_t* _mutex;
       bool writeByte(byte value);
   public:
 
