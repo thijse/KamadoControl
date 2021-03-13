@@ -1,6 +1,7 @@
 // https://savjee.be/2019/12/esp32-tips-to-increase-battery-life/
 // https://www.robmiles.com/journal/2020/1/20/disabling-the-esp32-brownout-detector
 
+#include <analogWrite.h>
 #include <ArduinoLog.h>
 #include "WiFi.h" 
 #include "driver/adc.h"

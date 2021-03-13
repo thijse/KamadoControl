@@ -92,6 +92,9 @@
     <ClInclude Include="TemperatureResults.h">
       <Filter>TemperatureControl</Filter>
     </ClInclude>
+    <ClInclude Include="DamperControl.h">
+      <Filter>TemperatureControl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Battery.cpp">
@@ -131,6 +134,9 @@
       <Filter>TemperatureControl</Filter>
     </ClCompile>
     <ClCompile Include="ThermistorConversion.cpp">
+      <Filter>TemperatureControl</Filter>
+    </ClCompile>
+    <ClCompile Include="DamperControl.cpp">
       <Filter>TemperatureControl</Filter>
     </ClCompile>
   </ItemGroup>

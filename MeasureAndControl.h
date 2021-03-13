@@ -7,6 +7,7 @@
 #include <PID_v2.h>
 
 #include "ADC.h"
+#include "DamperControl.h"
 #include "ThermoCouple.h"
 #include "TripleBuffer.h"
 #include "State.h"
@@ -27,6 +28,7 @@ private:
     ThermoCouple                  _thermo1;
     ThermoCouple                  _thermo2;
     Thermistor                    _thermistor;
+    DamperControl                 _damper;
     TripleBuffer<MeasurementData> _measurements;
     State<float>                  _targetTemperature;
     SemaphoreHandle_t             _mutex;
@@ -34,7 +36,7 @@ private:
     static void setServo             (float servoTarget);
     void        powerCycleBoard      ();
 public:
-    MeasureAndControl                (const MeasureAndControl& other)            = delete;
+    MeasureAndControl                (const MeasureAndControl& other) = delete;
     MeasureAndControl& operator=     (const MeasureAndControl& other) = delete;
     MeasureAndControl                (SemaphoreHandle_t mutex);
     ~MeasureAndControl               ();

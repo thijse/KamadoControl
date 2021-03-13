@@ -20,6 +20,6 @@ public:
 
 
     static void inputEvent();
-    
-    
+    static void powerCycleBoard();
+    static void setBoardActive(bool isActive);
 };

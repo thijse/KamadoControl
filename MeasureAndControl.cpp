@@ -4,7 +4,7 @@
 
 MeasureAndControl::MeasureAndControl(SemaphoreHandle_t mutex) :
     _mutex(mutex),
-    _pidControl(2, 5, 1, PID::Direct, PID::P_On::Measurement),
+    _pidControl(2, 0, 1, PID::Direct, PID::P_On::Measurement),
     _adc        (0x40, mutex),
     _thermo1    (0x60, mutex),
     _thermo2    (0x60, mutex),
@@ -12,7 +12,7 @@ MeasureAndControl::MeasureAndControl(SemaphoreHandle_t mutex) :
 {
     configureThermoSensor(_thermo1);
     configureThermoSensor(_thermo2);    
-
+    _damper.setActive(true);
     _pidControl.Start(
         20.0f,    // input
         0,        // current output
@@ -41,8 +41,9 @@ void MeasureAndControl::update()
     _measurements.releaseWriteBuffer();
 
     _pidControl.Setpoint(targetTemp);
-    const float servoTarget = (float)_pidControl.Run(measurement->temperatureResults.temperature[3]);
-    setServo(servoTarget);   
+    const float damperValue = (float)_pidControl.Run(measurement->temperatureResults.temperature[3]);
+    _damper.setOpen(damperValue);
+    
 }
 
 void MeasureAndControl::setServo(float servoTarget)
