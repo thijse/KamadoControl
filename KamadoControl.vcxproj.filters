@@ -95,6 +95,12 @@
     <ClInclude Include="DamperControl.h">
       <Filter>TemperatureControl</Filter>
     </ClInclude>
+    <ClInclude Include="MenuControl.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="RangedRotaryEncoder.h">
+      <Filter>System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Battery.cpp">
@@ -138,6 +144,12 @@
     </ClCompile>
     <ClCompile Include="DamperControl.cpp">
       <Filter>TemperatureControl</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuControl.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="RangedRotaryEncoder.cpp">
+      <Filter>System</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

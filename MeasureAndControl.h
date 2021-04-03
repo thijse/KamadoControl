@@ -5,7 +5,7 @@
 #include "arduino.h"
 #include <ArduinoLog.h>
 #include <PID_v2.h>
-
+#include "Constants.h"
 #include "ADC.h"
 #include "DamperControl.h"
 #include "ThermoCouple.h"
@@ -23,6 +23,7 @@ public:
 class MeasureAndControl
 {
 private:
+    SemaphoreHandle_t             _mutex;
     PID_v2                        _pidControl;
     ADC                           _adc;
     ThermoCouple                  _thermo1;
@@ -30,18 +31,31 @@ private:
     Thermistor                    _thermistor;
     DamperControl                 _damper;
     TripleBuffer<MeasurementData> _measurements;
-    State<float>                  _targetTemperature;
-    SemaphoreHandle_t             _mutex;
+    float                         _targetTemperature;
+    ControlValues                *_controlValues;
+
+    int                           _tempControlSource  = 0;
+    int                           _temperatureControl = HIGH;
+    int                           _damperMin          = 0;
+    int                           _damperMax          = 180;
+    double                        _pidP               = 1.0;
+    double                        _pidI               = 60.0;
+    double                        _pidD               = 0.0;
+
+
+
     static void configureThermoSensor(ThermoCouple& thermo);
-    static void setServo             (float servoTarget);
+    void        setDamperMin();
+    void        setDamperMax();
     void        powerCycleBoard      ();
 public:
     MeasureAndControl                (const MeasureAndControl& other) = delete;
     MeasureAndControl& operator=     (const MeasureAndControl& other) = delete;
-    MeasureAndControl                (SemaphoreHandle_t mutex);
+    MeasureAndControl                (SemaphoreHandle_t mutex, ControlValues *controlValues);
     ~MeasureAndControl               ();
     void update                      ();
+    void updateControl               ();
     MeasurementData* getMeasurements ();
     static float readTemperature     (ThermoCouple& thermo);
-    void setTargetTemperature        (float targetTemp);
+    
 };

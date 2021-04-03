@@ -44,8 +44,30 @@
 #define ROTARY_ENCODER_VCC_PIN    -1 /*put -1 of Rotary encoder Vcc is connected directly to 3,3V; else you can use declared output pin for powering rotary encoder */
 
 
-class Const
+enum MenuState {
+    menuIdle,
+    menuActive,
+    menuWaking,
+};
+
+class ControlValues 
 {
-public:
-   // static const
+private:
+    SemaphoreHandle_t _mutex = nullptr;
+public:   
+    ControlValues           (const ControlValues& other) = delete;
+    ControlValues& operator=(const ControlValues& other) = delete;
+    ControlValues() { _mutex = xSemaphoreCreateMutex();                   }
+    void lock()     { xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY);  }
+    void unlock()   { xSemaphoreGive(_mutex);                             }
+
+    int tempControlSource       = 0;
+    int temperatureControl      = HIGH;
+    int temperatureControlPauze = LOW;
+    int damperMin               = 0;
+    int damperMax               = 180;
+    double P                    = 1.0;
+    double I                    = 60.0;
+    double D                    = 0.0;
+    float  targetTemperature    = 20; 
 };

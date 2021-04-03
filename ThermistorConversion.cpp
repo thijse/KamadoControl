@@ -26,10 +26,10 @@
 	  a conventional voltage divider circuit.
 
 								   ____         ____
-	  +Vin       o----------------|_Rt_|---+---|_R0__|---o GND
-								   NTC(10K)|    (10K)
+	  +Vin       o----------------|_R0_|---+---|_Rt__|---o GND
+								   (10K)   |    NTC(10K)
 					   ___                 |
-	  adcValue   o----|ADC|  ---  V0 ----- +
+	  adcValue   o----|ADC|  ---  Vt ----- +
 						|
 	  +Vref      o------+
 */
@@ -37,22 +37,22 @@
 
 
 ThermistorConversion::ThermistorConversion(float vIn, float vRef, uint16_t adcMax) :
-	_vIn   (vIn      ),
-    _vRef  (vRef     ),
-    _adcMax(adcMax   ),
-    _r0    (10000.0f ),
-	_a  (1.129148e-3f),
-	_b  (2.34125e-4f ),
-	_c  (8.76741e-8f ),
-    _k  (9.5f        )
+	_vIn   (vIn          ),
+    _vRef  (vRef         ),
+    _adcMax(adcMax       ),
+    _r0    (10000.0f     ),
+	_a     (0.0022841105304199),
+	_b     (0            ),
+	_c     (0.0000151906113893158),
+    _k     (9.5f         )
 {
 }
 
 void ThermistorConversion::setNTC(
     float r0 = 10000.0f    ,
-    float a  = 1.129148e-3f,
-    float b  = 2.34125e-4f ,
-    float c  = 8.76741e-8f ,
+    float a  = 0.0022841105304199,
+    float b  = 0           ,
+    float c  = 0.0000151906113893158,
 	float k  = 9.5f
 	)
 {
@@ -69,30 +69,30 @@ void ThermistorConversion::setNTC(
   */
 float ThermistorConversion::steinhartHart(float rt)
 {
-	float log_r  = log(rt);
-	float log_r3 = log_r * log_r * log_r;
-	return 1.0f / (_a + _b * log_r + _c * log_r3);
-}
-
-
-float ThermistorConversion::getTempKelvin(uint16_t adcValue)
-{
-	// Calculate measured voltage
-	float v0    = ((float)adcValue / (float)_adcMax) * _vRef;
-	// Calculate resistance of NTC
-	float rt    = _r0 * ((_vIn / v0) - 1.0f);
-	// Account for dissipation factor K
-	rt         -=  v0 * v0 / (_k * _r0);
-
-	Log.noticeln(F("adcValue = %i, adcMax = %i, _vRef = %F, v0 = %F, rt = %F"), adcValue, _adcMax, _vRef, v0,rt);
-
-	return steinhartHart(rt);
+	float ln_r  = log(rt);
+	float ln_r3 = ln_r * ln_r * ln_r;
+	return 1.0f / (_a + _b * ln_r + _c * ln_r3);
 }
 
 
 float ThermistorConversion::getTempCelsius(uint16_t adcValue)
 {
-	return getTempKelvin(adcValue) - 273.15f;
+	// Calculate measured voltage
+	float vt    = ((float)adcValue / (float)_adcMax) * _vRef;
+	// Calculate resistance of NTC
+	float rt    = _r0 / ((_vIn / vt) - 1.0f);
+	// Account for dissipation factor K
+	//rt         -=  vt * vt / (_k * _r0);
+
+	Log.noticeln(F("adcValue = %i, adcMax = %i, _vRef = %F, v0 = %F, rt = %F"), adcValue, _adcMax, _vRef, vt,rt);
+
+	return steinhartHart(rt);
+}
+
+
+float ThermistorConversion::getTempKelvin(uint16_t adcValue)
+{
+	return getTempCelsius(adcValue) + 273.15f;
 }
 
 
