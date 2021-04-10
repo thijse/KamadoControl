@@ -8,11 +8,11 @@ public:
     DamperControl& operator=(const DamperControl& other) = delete;
 
     // Constructor
-    DamperControl();
+    DamperControl ();
     // Destructor
     ~DamperControl();
     void setActive(bool isActive);
-    void setOpen(float percentageOpen);
+    void setOpen  (int angleValue);
 
 private:
     Servo _servo;

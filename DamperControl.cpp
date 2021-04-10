@@ -1,9 +1,10 @@
 #include "DamperControl.h"
-#include "Constants.h"
+#include "Global.h"
 
 DamperControl::DamperControl() :
 _active(false)
 {
+	pinMode(O_50V2, OUTPUT);
     pinMode(O_50V1, OUTPUT);
 	// Allow allocation of all timers
 	ESP32PWM::allocateTimer(0);
@@ -27,7 +28,8 @@ void DamperControl::setActive(bool isActive)
     digitalWrite(O_50V2, isActive?HIGH:LOW);
 }
 
-void DamperControl::setOpen(float percentageOpen)
+void DamperControl::setOpen(int angleValue)
 {
-	_servo.write(percentageOpen*1.8);
+	//Serial.println("Set servo: "); Serial.println(angleValue);
+	_servo.write(angleValue);
 }

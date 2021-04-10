@@ -32,13 +32,3 @@ void RotaryEncoder::update()
 }
 
 RotaryEncoder     rotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, 4);
-
-
-
-//int16_t RotaryEncoder::getValue(void)
-//{
-//    int16_t value =  RotaryEncoder::getValue();
-//    Serial.print("RotaryEncoder delta: "); Serial.println(value);
-//    return value;
-//}
-

@@ -1,5 +1,6 @@
 #pragma once
 #include "arduino.h"
+#include "Global.h"
 
 #include <GxEPD2_GFX.h>
 #include <GxEPD2_EPD.h>
@@ -10,7 +11,8 @@
 #include <menuIO/clickEncoderIn.h>
 #include <menuIO/serialOut.h>
 #include <menuIO/serialIn.h>
-#include "Constants.h"
+#include "GxEPDOut.h"
+
 
 
 #include "Screen.h"
@@ -19,8 +21,6 @@ class MenuControl
 {
 protected:
 	Screen* _display;
-	//RotaryEncoder* _rotaryEncoder;
-	//ClickEncoderStream _encStream;
 	int     _posX;
 	int     _posY;
 	int     _width;

@@ -13,7 +13,7 @@
 #include <SPI.h>
 #include "System.h"
 
-#include "Constants.h"
+#include "Global.h"
 #include "RotaryEncoder.h"
 
 #include "MeasureAndControl.h"
@@ -25,7 +25,7 @@
 #include "Time.h"
 #include "SetTemperature.h"
 //#include "Logo.h"
-#include "SDCard.h"
+//#include "SDCard.h"
 #include "Battery.h"
 #include "Timer.h"
 #include "MenuControl.h"
@@ -36,18 +36,12 @@
 #include <Fonts/FreeMonoBold18pt7b.h>
 #include <Fonts/FreeMonoBold24pt7b.h>
 
-SemaphoreHandle_t wireMutex = xSemaphoreCreateMutex();
-Screen            display(wireMutex,ELINK_SS, ELINK_DC, ELINK_RESET, ELINK_BUSY);
-SPIClass          sdSPI(VSPI);
 ControlValues     controlValues;
 MeasureAndControl measureControl(wireMutex, &controlValues);
-//RotaryEncoder     rotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, 4);
 
 Battery           battery(&display, BATTERY_PIN);
 Timer             timer  (&display);
 SetTemperature    setTemperature(&display, &rotaryEncoder);
-//Logo              logo   (&display);
-//SDCard            sdcard (&display, SDCARD_SS);
 MenuControl       menuControl(&display, &controlValues);
 int               uiLoopCounter;
 int               measureLoopCounter;
@@ -62,10 +56,10 @@ void setup() {
     // Turn on measurement board
     pinMode(O_33V, OUTPUT);   // turn on power to board  
     digitalWrite(O_33V, 1);
-    //pinMode(O_50V1, OUTPUT); // turn on power to first external 5V 
-    //digitalWrite(O_50V1, 1);
-    //pinMode(O_50V2, OUTPUT); // turn on power to second external 5V 
-    //digitalWrite(O_50V2, 1);
+    pinMode(O_50V1, OUTPUT); // turn on power to first external 5V 
+    digitalWrite(O_50V1, 1);
+    pinMode(O_50V2, OUTPUT); // turn on power to second external 5V 
+    digitalWrite(O_50V2, 1);
 
     // initialize I2C communication 
     Wire.setClock(1000L);   
@@ -91,7 +85,6 @@ void setup() {
 
     // Start SPI Communication
     SPI.begin  (SPI_CLK   , SPI_MISO   , SPI_MOSI   , ELINK_SS);
-    sdSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_SS);
 
     // Settings to reduce power consumption
     System::PowerSafeMode();
@@ -105,12 +98,14 @@ void setup() {
     display.setFont      (&FreeMonoBold9pt7b);
     display.setCursor    (0, 0);
 
+    Serial.println(display.width());
+    Serial.println(display.height());
+
+
     // Initialize UI elements
     battery       .init();
     timer         .init();
     setTemperature.init();
-    //logo        .init();
-    //sdcard      .init(&sdSPI);
     menuControl   .init();
 
 
@@ -119,8 +114,6 @@ void setup() {
     battery       .draw();
     timer         .draw();
     setTemperature.draw();
-    //logo        .draw();
-    //sdcard      .draw();
     menuControl   .draw();
     display       .display(false); // full update
 
@@ -151,6 +144,7 @@ void loop()
 
 /*---------------------- Tasks ---------------------*/
 
+int pos = 0;
 
 void taskMain(void* pvParameters)
 {
@@ -162,17 +156,12 @@ void taskMain(void* pvParameters)
         battery       .update();
         timer         .update();
         menuControl   .update(menuState);
-        setTemperature.update(menuState);
-        //logo        .update();
-        //sdcard      .update();
-        
+        setTemperature.update(menuState);       
         display       .update(); // Update the screen depending on update requests.
 
         controlValues.lock();
         controlValues.targetTemperature = setTemperature.getTargetTemperature();
         controlValues.unlock();
-
-        //measureControl.setTargetTemperature(setTemperature.getTargetTemperature());
         
         MeasurementData* data = measureControl.getMeasurements();
         if (data != nullptr) {
@@ -190,6 +179,70 @@ void taskMain(void* pvParameters)
         // todo: make waiting time adaptive.
         //vTaskDelay(50 / portTICK_PERIOD_MS); 
     }
+
+    //if (Serial.available() > 0) {
+    //    // read the incoming byte:
+    //    byte incomingByte = Serial.read();
+
+    //    //Serial.print("Input: ");
+    //    //Serial.println(incomingByte, DEC);
+
+
+    //    switch (incomingByte) {
+    //    case '1':
+    //        Serial.println("V1 = 0");
+    //        digitalWrite(O_50V1, 0);
+    //        break;
+    //    case '2':
+    //        Serial.println("V1 = 1");
+    //        digitalWrite(O_50V1, 1);
+    //        break;
+    //    case '3':
+    //        Serial.println("V2 = 0");
+    //        digitalWrite(O_50V2, 0);
+    //        break;
+    //    case '4':
+    //        Serial.println("V2 = 1");
+    //        digitalWrite(O_50V2, 1);
+    //        break;
+    //    case 'u':
+    //        pos += 5;
+    //        Serial.print("servo pos ="); Serial.println(pos);
+    //        measureControl.setDamper(pos);
+    //        break;
+    //    case 'd':
+    //        pos -= 5;
+    //        Serial.print("servo pos ="); Serial.println(pos);
+    //        measureControl.setDamper(pos);
+    //        break;
+    //    case 'D':
+    //        pos = 0;
+    //        Serial.print("servo pos ="); Serial.println(pos);
+    //        measureControl.setDamper(pos);
+    //        break;
+    //    case 'U':
+    //        pos = 180;
+    //        Serial.print("servo pos ="); Serial.println(pos);
+    //        measureControl.setDamper(pos);
+    //        break;
+    //    case 'S':
+    //        pos = 180;
+    //        Serial.print("Sweep");
+    //        measureControl.setDamper(pos);
+    //        for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    //                                              // in steps of 1 degree
+    //            measureControl.setDamper(pos);
+    //            delay(14);             // waits 15ms for the servo to reach the position
+    //        }
+    //        for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+    //            measureControl.setDamper(pos);
+    //            delay(14);             // waits 15ms for the servo to reach the position
+    //        }
+    //        break;
+    //    }
+
+    //}
+
 }
 
 void taskMeasureAndControl(void* pvParameters)  // This is a task.
@@ -200,6 +253,6 @@ void taskMeasureAndControl(void* pvParameters)  // This is a task.
     {
         Log.traceln(F("measure loop %d"), measureLoopCounter++);
         measureControl.update();
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        vTaskDelay((1000 ) / portTICK_PERIOD_MS);
     }
 }

@@ -2,7 +2,7 @@
 
 #pragma once
 #include "arduino.h"
-#include "Constants.h"
+#include "Global.h"
 #include <ClickEncoder.h>
 
 class RotaryEncoder: public ClickEncoder
@@ -17,9 +17,6 @@ class RotaryEncoder: public ClickEncoder
 	RotaryEncoder(int8_t A, int8_t B, int8_t BTN = -1, uint8_t stepsPerNotch = 4, bool active = LOW) : ClickEncoder(A, B, BTN, stepsPerNotch, active) {};
 	void init();
 	void update();
-
-	
-
 };
 
 extern RotaryEncoder rotaryEncoder;

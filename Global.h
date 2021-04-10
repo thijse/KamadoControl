@@ -1,5 +1,6 @@
 #pragma once
 #include "arduino.h"
+#include "Screen.h"
 
 #if CONFIG_FREERTOS_UNICORE
 #define ARDUINO_RUNNING_CORE 0
@@ -29,10 +30,10 @@
 #define ELINK_DC                  17
 
 // SPI pins for SD card reader
-#define SDCARD_SS                 13
-#define SDCARD_CLK                14
-#define SDCARD_MOSI               15
-#define SDCARD_MISO                2
+//#define SDCARD_SS                 13
+//#define SDCARD_CLK                14
+//#define SDCARD_MOSI               15
+//#define SDCARD_MISO                2
 
 // Battery pin
 #define BATTERY_PIN               35
@@ -44,8 +45,13 @@
 #define ROTARY_ENCODER_VCC_PIN    -1 /*put -1 of Rotary encoder Vcc is connected directly to 3,3V; else you can use declared output pin for powering rotary encoder */
 
 
+extern SemaphoreHandle_t wireMutex;
+extern Screen            display;
+
+
 enum MenuState {
     menuIdle,
+    menuIdleStart,
     menuActive,
     menuWaking,
 };
@@ -61,13 +67,14 @@ public:
     void lock()     { xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY);  }
     void unlock()   { xSemaphoreGive(_mutex);                             }
 
-    int tempControlSource       = 0;
-    int temperatureControl      = HIGH;
-    int temperatureControlPauze = LOW;
-    int damperMin               = 0;
-    int damperMax               = 180;
-    double P                    = 1.0;
-    double I                    = 60.0;
-    double D                    = 0.0;
-    float  targetTemperature    = 20; 
+    int tempControlSource        = 0;
+    int temperatureControl       = HIGH;
+    bool calibrateDamperMinMax   = false;
+    int damperMin                = 0;
+    int damperMax                = 180;
+    int damperVal                = 90;
+    double P                     = 1.0;
+    double I                     = 60.0;
+    double D                     = 0.0;
+    float  targetTemperature     = 20; 
 };

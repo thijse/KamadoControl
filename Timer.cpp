@@ -1,14 +1,14 @@
 #include "Timer.h"
 #include <Fonts/FreeMonoBold9pt7b.h>
-#include <Fonts/Picopixel.h>
-
 #include "Fonts/FreeSans8pt7b.h"
 #include "Fonts/FreeSansBold8pt7b.h"
+#include <Fonts/Picopixel.h>
+
 
 
 Timer::Timer(Screen* display) :
     _display(display),
-    _posX(175), _posY(20),
+    _posX(175), _posY(10),
     _x(0), _y(0), _w(0), _h(0)
 {
 }

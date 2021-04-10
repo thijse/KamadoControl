@@ -9,7 +9,7 @@ Battery::Battery(
     _vMin         (3.6)                                  ,
     _vMax         (4.2)                                  ,
     _posX         (250-22)                               ,
-    _posY         (10)                                   ,
+    _posY         (00)                                   ,
     _width        (20)                                   ,
     _height       (10)                                   ,
     _vSlope       (100.0f/(_vMax- _vMin))                ,       

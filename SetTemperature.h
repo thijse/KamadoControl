@@ -2,7 +2,7 @@
 #pragma once 
 #include "arduino.h"
 #include <ArduinoLog.h>
-#include "Constants.h"
+#include "Global.h"
 #include "RangedRotaryEncoder.h"
 #include "Screen.h"
 
