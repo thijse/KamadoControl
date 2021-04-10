@@ -173,6 +173,7 @@ void MenuControl::update(MenuState &menuState)
 
 void MenuControl::setControlValues()
 {
+    // no lock needed, values are set in same thread, so will not be called while setting
     pPid                    = _controlValues->P;
     iPid                    = _controlValues->I;
     dPid                    = _controlValues->D;
@@ -186,6 +187,7 @@ void MenuControl::setControlValues()
 
 void MenuControl::getControlValues()
 {
+    _controlValues->lock();
     _controlValues->P                       = pPid;
     _controlValues->I                       = iPid;
     _controlValues->D                       = dPid;
@@ -195,6 +197,7 @@ void MenuControl::getControlValues()
     _controlValues->tempControlSource       = tempControlSource;
     _controlValues->temperatureControl      = temperatureControl;
     _controlValues->calibrateDamperMinMax   = calibrateDamperMinMax;
+    _controlValues->unlock();
 }
 
 result MenuControl::setTemperatureControl(eventMask e, navNode& nav, prompt& item) {
