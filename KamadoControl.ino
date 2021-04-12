@@ -173,7 +173,7 @@ void taskMain(void* pvParameters)
             //Serial.print("Temperature 5     : ") ; if (data->temperatureResults.success[5]) Serial.println(data->temperatureResults.temperature[5]); else Serial.println("--:--");
             //Serial.print("Target Temperature: ") ; Serial.println(data->targetTemperature);
 
-            setTemperature.setCurrentTemperature(data->temperatureResults.temperature[0]);
+            setTemperature.setCurrentTemperature(data->temperatureResults.temperature[controlValues.tempControlSource], data->damperValue);
         }                
 
         // todo: make waiting time adaptive.

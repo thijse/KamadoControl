@@ -17,5 +17,6 @@ public:
 private:
     Servo _servo;
     bool _active; 
+    int _previousValue = - 1;
 };
 

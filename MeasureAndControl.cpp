@@ -45,16 +45,21 @@ void MeasureAndControl::update()
         _thermo1.   readTemperature(1, measurement->temperatureResults);
         _thermistor.readTemperature(2, measurement->temperatureResults);
         measurement->targetTemperature = _targetTemperature;
+        measurement->damperValue       = _lastDamperVal;
         _measurements.releaseWriteBuffer();
+
+        // todo, fix which dampervalue to send
 
         if (_temperatureControl) {
             const float damperValue = (float)_pidControl.Run(measurement->temperatureResults.temperature[_tempControlSource]);
             Log.noticeln(F("current value=%F, damper value+%F, P=%F, I=%F, D=%F"), measurement->temperatureResults.temperature[_tempControlSource], damperValue, _pidControl.GetLastP(), _pidControl.GetLastI(), _pidControl.GetLastD());
-            _damper.setOpen(damperValue);
+            _lastDamperVal = damperValue;
+            _damper.setOpen(damperValue);            
         }
     }
     else {
         // set manually defined damper
+        _lastDamperVal = _damperVal;
         _damper.setOpen(_damperVal);
     }
     
@@ -97,8 +102,9 @@ void MeasureAndControl::setDamperMax()
 
 void MeasureAndControl::setDamperVal(int damperValue)
 {
-    Serial.println("Setting damper :"); Serial.println(damperValue);
+    Serial.println("Setting damper :"); Serial.println(damperValue);    
     _damper.setOpen(damperValue);
+    _lastDamperVal = damperValue;
 }
 
 void MeasureAndControl::powerCycleBoard()

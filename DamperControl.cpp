@@ -30,6 +30,8 @@ void DamperControl::setActive(bool isActive)
 
 void DamperControl::setOpen(int angleValue)
 {
-	//Serial.println("Set servo: "); Serial.println(angleValue);
+	if (angleValue == _previousValue) return;
+	_previousValue = angleValue;
+	Serial.println("Set servo: "); Serial.println(angleValue);
 	_servo.write(angleValue);
 }

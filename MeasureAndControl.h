@@ -18,6 +18,7 @@ struct MeasurementData {
 public:
     TemperatureResults temperatureResults;
     float              targetTemperature;
+    int                damperValue;
 };
 
 class MeasureAndControl
@@ -34,16 +35,17 @@ private:
     float                         _targetTemperature;
     ControlValues                *_controlValues;
 
-    int                           _tempControlSource  = 0;
-    bool                          _temperatureMeasure = true;
+    int                           _tempControlSource    = 0;
+    bool                          _temperatureMeasure   = true;
     bool                          _delayNextMeasurement = true;
-    int                           _temperatureControl = HIGH;
-    int                           _damperMin          = 0;
-    int                           _damperMax          = 180;
-    int                           _damperVal          = 90;
-    double                        _pidP               = 1.0;
-    double                        _pidI               = 60.0;
-    double                        _pidD               = 0.0;
+    int                           _temperatureControl   = HIGH;
+    int                           _damperMin            = 0;
+    int                           _damperMax            = 180;
+    int                           _damperVal            = 90;
+    int                           _lastDamperVal        = 90;
+    double                        _pidP                 = 1.0;
+    double                        _pidI                 = 60.0;
+    double                        _pidD                 = 0.0;
 
     static void configureThermoSensor(ThermoCouple& thermo);
     void        setDamperMin();
