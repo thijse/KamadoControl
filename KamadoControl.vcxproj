@@ -109,6 +109,7 @@
     <ClInclude Include="ADC.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="AiEsp32RotaryEncoder.h" />
     <ClInclude Include="AutoResetEvent.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -129,10 +130,7 @@
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="MenuControl.h" />
-    <ClInclude Include="RangedRotaryEncoder.h" />
-    <ClInclude Include="RotaryEncoder.h">
-      <FileType>CppCode</FileType>
-    </ClInclude>
+    <ClInclude Include="RotaryClickEncoderStream.h" />
     <ClInclude Include="Screen.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -163,13 +161,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ADC.cpp" />
+    <ClCompile Include="AiEsp32RotaryEncoder.cpp" />
     <ClCompile Include="Battery.cpp" />
     <ClCompile Include="DamperControl.cpp" />
     <ClCompile Include="Global.cpp" />
     <ClCompile Include="MeasureAndControl.cpp" />
     <ClCompile Include="MenuControl.cpp" />
-    <ClCompile Include="RangedRotaryEncoder.cpp" />
-    <ClCompile Include="RotaryEncoder.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="SetTemperature.cpp" />
     <ClCompile Include="System.cpp" />

@@ -14,8 +14,7 @@
 #include "System.h"
 
 #include "Global.h"
-#include "RotaryEncoder.h"
-
+#include "AiEsp32RotaryEncoder.h"
 #include "MeasureAndControl.h"
 #include "ThermoCouple.h"
 
@@ -41,7 +40,7 @@ MeasureAndControl measureControl(wireMutex, &controlValues);
 
 Battery           battery(&display, BATTERY_PIN);
 Timer             timer  (&display);
-SetTemperature    setTemperature(&display, &rotaryEncoder);
+SetTemperature    setTemperature(&display);
 MenuControl       menuControl(&display, &controlValues);
 int               uiLoopCounter;
 int               measureLoopCounter;
@@ -79,9 +78,13 @@ void setup() {
     measureLoopCounter = 0;
 
     // Initialize rotary click encoder    
-    rotaryEncoder.setAccelerationEnabled(true);
-    rotaryEncoder.setDoubleClickEnabled(false); // Disable doubleclicks makes the response faster.  
-    rotaryEncoder.init();                       // Triggers timer interrupt driven polling
+	rotaryEncoder.begin();
+		rotaryEncoder.setup(
+		[] { rotaryEncoder.readEncoder_ISR(); },
+		[] { rotaryEncoder.readButton_ISR(); });
+	rotaryEncoder.setAcceleration(100);
+	rotaryEncoder.setBoundaries(0, 500, false); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
+
 
     // Start SPI Communication
     SPI.begin  (SPI_CLK   , SPI_MISO   , SPI_MOSI   , ELINK_SS);
@@ -150,13 +153,32 @@ void taskMain(void* pvParameters)
 {
     (void)pvParameters;
 
-    for (;;) // A Task shall never return or exit.
-    {
-       // Log.traceln(F("ui loop %d"),uiLoopCounter++);
-        battery       .update();
-        timer         .update();
-        menuControl   .update(menuState);
-        setTemperature.update(menuState);       
+	for (;;) // A Task shall never return or exit.
+	{
+		// Log.traceln(F("ui loop %d"),uiLoopCounter++);
+		// Check for button press in menu idle state
+		if (menuState == MenuState::menuIdle && rotaryEncoder.ClickOccured())
+		{
+			menuState = MenuState::menuWaking;	
+		}
+		// Draw UI elements
+		battery.update();
+		timer.update();		
+		switch (menuState)
+		{
+			case MenuState::menuIdle:
+				// Draw temperature menu. Target temperature either from rotary encoder or from last stored value
+				setTemperature.update(rotaryEncoder.readEncoderValue());
+				break;
+			default:
+				// Draw menu
+				if (menuControl.update(menuState))
+				{	// True: we switched to menu idle, restore position of rotary button
+					rotaryEncoder.setAcceleration(100);
+					rotaryEncoder.setEncoderValue(setTemperature.getTargetTemperature());
+				}
+		}
+		// Update display
         display       .update(); // Update the screen depending on update requests.
 
         controlValues.lock();
@@ -179,70 +201,6 @@ void taskMain(void* pvParameters)
         // todo: make waiting time adaptive.
         //vTaskDelay(50 / portTICK_PERIOD_MS); 
     }
-
-    //if (Serial.available() > 0) {
-    //    // read the incoming byte:
-    //    byte incomingByte = Serial.read();
-
-    //    //Serial.print("Input: ");
-    //    //Serial.println(incomingByte, DEC);
-
-
-    //    switch (incomingByte) {
-    //    case '1':
-    //        Serial.println("V1 = 0");
-    //        digitalWrite(O_50V1, 0);
-    //        break;
-    //    case '2':
-    //        Serial.println("V1 = 1");
-    //        digitalWrite(O_50V1, 1);
-    //        break;
-    //    case '3':
-    //        Serial.println("V2 = 0");
-    //        digitalWrite(O_50V2, 0);
-    //        break;
-    //    case '4':
-    //        Serial.println("V2 = 1");
-    //        digitalWrite(O_50V2, 1);
-    //        break;
-    //    case 'u':
-    //        pos += 5;
-    //        Serial.print("servo pos ="); Serial.println(pos);
-    //        measureControl.setDamper(pos);
-    //        break;
-    //    case 'd':
-    //        pos -= 5;
-    //        Serial.print("servo pos ="); Serial.println(pos);
-    //        measureControl.setDamper(pos);
-    //        break;
-    //    case 'D':
-    //        pos = 0;
-    //        Serial.print("servo pos ="); Serial.println(pos);
-    //        measureControl.setDamper(pos);
-    //        break;
-    //    case 'U':
-    //        pos = 180;
-    //        Serial.print("servo pos ="); Serial.println(pos);
-    //        measureControl.setDamper(pos);
-    //        break;
-    //    case 'S':
-    //        pos = 180;
-    //        Serial.print("Sweep");
-    //        measureControl.setDamper(pos);
-    //        for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
-    //                                              // in steps of 1 degree
-    //            measureControl.setDamper(pos);
-    //            delay(14);             // waits 15ms for the servo to reach the position
-    //        }
-    //        for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-    //            measureControl.setDamper(pos);
-    //            delay(14);             // waits 15ms for the servo to reach the position
-    //        }
-    //        break;
-    //    }
-
-    //}
-
 }
 
 void taskMeasureAndControl(void* pvParameters)  // This is a task.

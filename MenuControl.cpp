@@ -88,7 +88,7 @@ const int menuColumns = menuWidth  / fontW;
 const int menuLines   = menuHeight / fontH;
 
 
-ClickEncoderStream encStream(rotaryEncoder, 1);
+RotaryClickEncoderStream encStream(rotaryEncoder);
 
 const panel panels[] MEMMODE = { {0, 0, menuColumns, menuLines} }; // Main menu panel
 //const panel panels[] MEMMODE = { {0, 0, 200/ fontW, 100/ fontH} }; // Main menu panel
@@ -147,21 +147,40 @@ void MenuControl::draw()
     //update(MenuState::idle);
 }
 
-void MenuControl::update(MenuState &menuState)
+// Returns true when menu is turned off
+bool MenuControl::update(MenuState &menuState)
 {
+	if (menuState == MenuState::menuIdle)
+	{
+		return false;
+	}
     // Check if menu is starting, running or idle
-    if (menuState == MenuState::menuWaking)                                        {  menuState = MenuState::menuActive; internalMenuState = MenuState::menuActive; nav.reset(); }
-    if (menuState == MenuState::menuIdle  )                                        { return;                                                                                     }
-
-    setControlValues(); // set current values to control values
+    if (menuState == MenuState::menuWaking)
+	{  
+		menuState = MenuState::menuActive; 
+		internalMenuState = MenuState::menuActive; 
+		nav.reset();
+		rotaryEncoder.setAcceleration(0);
+		encStream.flush();							// flush makes sure we are not going to take steps when switching to menu mode
+		// @@@ TO DO: MAKE SURE LIMITS OF ROTARY ENCODER ARE TURNED OFF!!!
+	}
     
+	// No idea
+    setControlValues(); // set current values to control values
+    // Set font
     _display->setFont(&FreeSansBold8pt7b);
-    nav.poll();
+	// Process input as long as there is input...
+	while (encStream.available())
+	{
+		nav.doInput();
+	}
+	// Generate output
+	nav.doOutput();
+	// Dunno
     getControlValues();// gets update values from control values
 
     if (internalMenuState == MenuState::menuIdleStart) {
         // cleaning up when menu off
-        Serial.println("cleaning up");
         _display->fillRect(menuLeft, menuTop, menuWidth, menuHeight, GxEPD_WHITE);
         internalMenuState = MenuState::menuIdle;        
     }
@@ -169,6 +188,8 @@ void MenuControl::update(MenuState &menuState)
     menuState = internalMenuState;
     // Always request a partial update 
     _display->updateRequest(Screen::none);
+
+	return menuState == MenuState::menuIdle;
 }
 
 void MenuControl::setControlValues()
@@ -201,7 +222,7 @@ void MenuControl::getControlValues()
 }
 
 result MenuControl::setTemperatureControl(eventMask e, navNode& nav, prompt& item) {
-    Serial.print("\nTemperature control set to "); Serial.println(temperatureControl);
+    //Serial.print("\nTemperature control set to "); Serial.println(temperatureControl);
     //Serial.print("event type: ");
     //Serial.println(e);
     return proceed;
@@ -211,21 +232,21 @@ result MenuControl::setDamperMin(eventMask e, navNode& nav, prompt& item) {
     switch (e)
     {
     case Menu::enterEvent:
-        Serial.println("\npause measure&control");
+        //Serial.println("\npause measure&control");
         calibrateDamperMinMax = true;
         break;
     case Menu::exitEvent:
     case Menu::blurEvent:
     case Menu::selBlurEvent:
-        Serial.println("\nresume measure&control");
+        //Serial.println("\nresume measure&control");
         calibrateDamperMinMax = false;
         break;
         return proceed;
     }
     if (damperMin > damperMax) damperMin = damperMax;
     damperVal = damperMin;
-    Serial.print("Set damper damper range to min value "); Serial.print(damperMin);
-    Serial.print("Set damper damper val to "); Serial.print(damperVal);
+    //Serial.print("Set damper damper range to min value "); Serial.print(damperMin);
+    //Serial.print("Set damper damper val to "); Serial.print(damperVal);
     return proceed;
 }
 
@@ -233,29 +254,29 @@ result MenuControl::setDamperMax(eventMask e, navNode& nav, prompt& item) {
     switch (e)
     {
     case Menu::enterEvent:
-        Serial.println("\npause measure&control");
+        //Serial.println("\npause measure&control");
         // todo: make this a pauze & resume to the temperatureControl state
         calibrateDamperMinMax = true;
         break;
     case Menu::exitEvent:
     case Menu::blurEvent:
     case Menu::selBlurEvent:
-        Serial.println("\nresume measure&control");
+        //Serial.println("\nresume measure&control");
         calibrateDamperMinMax = false;
         break;
     return proceed;
     }
     if (damperMax < damperMin ) damperMax = damperMin;
     damperVal = damperMax;
-    Serial.print("Set damper damper range to max value "); Serial.print(damperMax);
-    Serial.print("Set damper damper val to "); Serial.print(damperVal);
+    //Serial.print("Set damper damper range to max value "); Serial.print(damperMax);
+    //Serial.print("Set damper damper val to "); Serial.print(damperVal);
     return proceed;
 }
 
 result MenuControl::setTempControlSource(eventMask e, navNode& nav, prompt& item)
 {
     if (tempControlSource == -1) tempControlSource = 5;
-    Serial.print("Set temperature control source to "); Serial.print(tempControlSource);
+    //Serial.print("Set temperature control source to "); Serial.print(tempControlSource);
     return proceed;
 }
 

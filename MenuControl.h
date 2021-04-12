@@ -6,9 +6,8 @@
 #include <GxEPD2_EPD.h>
 #include <GxEPD2_BW.h>
 #include <GxEPD2.h>
-#include "RotaryEncoder.h"
+#include "RotaryClickEncoderStream.h"
 #include <menu.h>
-#include <menuIO/clickEncoderIn.h>
 #include <menuIO/serialOut.h>
 #include <menuIO/serialIn.h>
 #include "GxEPDOut.h"
@@ -37,7 +36,7 @@ public:
     MenuControl(Screen* display, ControlValues* controlValues);
 	void init();
 	void draw();
-	void update(MenuState &menuState);
+	bool update(MenuState &menuState);
 	void setControlValues();
 	void getControlValues();
 };

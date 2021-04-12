@@ -1,5 +1,4 @@
 #include "SetTemperature.h"
-#include "RotaryEncoder.h"
 #include <Fonts/FreeMonoBold24pt7b.h>
 #include <Fonts/FreeMonoBold18pt7b.h>
 #include "Fonts/FreeSansBold32pt7b.h"
@@ -10,10 +9,8 @@
 // SetTemperature* pointerToSetTemperature = nullptr;
 // todo: rename class to SetValues;
 
-SetTemperature::SetTemperature(Screen* display, RotaryEncoder* rotaryEncoder) :
+SetTemperature::SetTemperature(Screen* display) :
     _display(display),
-    _rotaryEncoder(rotaryEncoder),
-    _rangedRotaryEncoder(_rotaryEncoder),
     _posX(25), _posY(80),
     _x(0), _y(0), _w(0),_h(0),
     _posXDamper(5), _posYDamper(10),
@@ -22,11 +19,7 @@ SetTemperature::SetTemperature(Screen* display, RotaryEncoder* rotaryEncoder) :
     _currentTemperature (20.0f),
     _targetTemperature  (20)
 {
-    //_rotaryEncoder->getButton();
-    _rangedRotaryEncoder.reset        (_targetTemperature);
-    _rangedRotaryEncoder.setBoundaries(0, 400, false);
-    _rangedRotaryEncoder.enable       ();
-    ClickEncoder::Button b = _rangedRotaryEncoder.Encoder->getButton();
+
 }
 
 void SetTemperature::init()
@@ -44,8 +37,10 @@ void SetTemperature::init()
 
 }
 
-void SetTemperature::update(MenuState &menuState)
-{
+void SetTemperature::update(int16_t new_target_temperature)
+{        
+	_targetTemperature = new_target_temperature;
+
      // Set damper value in header
     _display->setFont(&FreeSansBold8pt7b);
     _display->setTextColor(GxEPD_BLACK);
@@ -54,9 +49,6 @@ void SetTemperature::update(MenuState &menuState)
     _display->setCursor(_posXDamper, _posYDamper);
     _display->println(_damperValue);
 
-    // if menu is running, do not override it with values
-    if (menuState != MenuState::menuIdle) return;
-    rotaryInput(menuState);
 
     _display->setFont      (&FreeMonoBold24pt7b);
     _display->setTextColor (GxEPD_BLACK);
@@ -71,22 +63,6 @@ void SetTemperature::update(MenuState &menuState)
     _display->updateRequest(Screen::partial);
 }
 
-void SetTemperature::rotaryInput(MenuState& menuState) {
-    ClickEncoder::Button b = _rangedRotaryEncoder.Encoder->getButton();
-    //first lets handle rotary encoder button click
-    if (b != ClickEncoder::Open) {
-        switch (b) {
-        case ClickEncoder::Clicked:
-        case ClickEncoder::DoubleClicked:
-            Log.noticeln(F("Button pressed!"));
-            menuState = MenuState::menuWaking;
-            break;
-        }
-    }
-
-    _targetTemperature = _rangedRotaryEncoder.getValue();
-    
-}
 
 void SetTemperature::draw()
 {

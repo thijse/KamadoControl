@@ -82,8 +82,8 @@ public:
 	/// </summary>
 	/// <returns>Pointer to buffer of type T</returns>
 	T* getClonedWriteBuffer() {
-		if (_writeIndex < 0) return nullptr;
-		if (_newIndex   =>0) memcpy ( &_newIndex, &_writeIndex, sizeof(_newIndex) ); // no locking needed because we assume the read thread will not update struct			
+		if (_writeIndex <  0) return nullptr;
+		if (_newIndex   >= 0) memcpy ( &_newIndex, &_writeIndex, sizeof(_newIndex) ); // no locking needed because we assume the read thread will not update struct			
 		return &_buffers[_writeIndex];
 	}
 

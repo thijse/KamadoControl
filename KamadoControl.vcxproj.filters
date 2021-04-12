@@ -43,9 +43,6 @@
     <ClInclude Include="State.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="RotaryEncoder.h">
-      <Filter>System</Filter>
-    </ClInclude>
     <ClInclude Include="Screen.h">
       <Filter>System</Filter>
     </ClInclude>
@@ -92,11 +89,14 @@
     <ClInclude Include="MenuControl.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="RangedRotaryEncoder.h">
-      <Filter>System</Filter>
-    </ClInclude>
     <ClInclude Include="GxEPDOut.h">
       <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="RotaryClickEncoderStream.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="AiEsp32RotaryEncoder.h">
+      <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -108,9 +108,6 @@
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="RotaryEncoder.cpp">
-      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="ADC.cpp">
       <Filter>System</Filter>
@@ -139,9 +136,9 @@
     <ClCompile Include="MenuControl.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="RangedRotaryEncoder.cpp">
+    <ClCompile Include="Global.cpp" />
+    <ClCompile Include="AiEsp32RotaryEncoder.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="Global.cpp" />
   </ItemGroup>
 </Project>

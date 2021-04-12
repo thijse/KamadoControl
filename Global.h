@@ -1,6 +1,7 @@
 #pragma once
 #include "arduino.h"
 #include "Screen.h"
+#include "AiEsp32RotaryEncoder.h"
 
 #if CONFIG_FREERTOS_UNICORE
 #define ARDUINO_RUNNING_CORE 0
@@ -42,12 +43,11 @@
 #define ROTARY_ENCODER_A_PIN      36
 #define ROTARY_ENCODER_B_PIN      34
 #define ROTARY_ENCODER_BUTTON_PIN 39
-#define ROTARY_ENCODER_VCC_PIN    -1 /*put -1 of Rotary encoder Vcc is connected directly to 3,3V; else you can use declared output pin for powering rotary encoder */
 
 
 extern SemaphoreHandle_t wireMutex;
 extern Screen            display;
-
+extern AiEsp32RotaryEncoder rotaryEncoder; 
 
 enum MenuState {
     menuIdle,
