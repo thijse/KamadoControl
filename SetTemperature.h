@@ -10,15 +10,16 @@ class SetTemperature
 {
 protected:
 	Screen*              _display;
-	int                  _posX;
-	int                  _posY;
-	int16_t              _x{};
-	int16_t              _y{};
-	uint16_t             _w{};
-	uint16_t             _h{};
-
+	int                  _posTempX;
+	int                  _posTempY;
 	int                  _posXDamper;
 	int                  _posYDamper;
+
+	int16_t              _xTemp{};
+	int16_t              _yTemp{};
+	uint16_t             _wTemp{};
+	uint16_t             _hTemp{};
+
 	int16_t              _xDamper{};
 	int16_t              _yDamper{};
 	uint16_t             _wDamper{};

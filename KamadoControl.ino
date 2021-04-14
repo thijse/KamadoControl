@@ -48,6 +48,7 @@ MenuState         menuState = MenuState::menuIdle;
 
 
 void taskMain(void* pvParameters);
+void menuAndNumbersUpdate();
 void taskMeasureAndControl(void* pvParameters);
 
 void setup() {
@@ -157,30 +158,15 @@ void taskMain(void* pvParameters)
 	{
 		// Log.traceln(F("ui loop %d"),uiLoopCounter++);
 		// Check for button press in menu idle state
-		if (menuState == MenuState::menuIdle && rotaryEncoder.ClickOccured())
-		{
-			menuState = MenuState::menuWaking;	
-		}
-		// Draw UI elements
-		battery.update();
-		timer.update();		
-		switch (menuState)
-		{
-			case MenuState::menuIdle:
-				// Draw temperature menu. Target temperature either from rotary encoder or from last stored value
-				setTemperature.update(rotaryEncoder.readEncoderValue());
-				break;
-			default:
-				// Draw menu
-				if (menuControl.update(menuState))
-				{	// True: we switched to menu idle, restore position of rotary button
-					rotaryEncoder.setAcceleration(100);
-					rotaryEncoder.setEncoderValue(setTemperature.getTargetTemperature());
-				}
-		}
-		// Update display
-        display       .update(); // Update the screen depending on update requests.
+		if (menuState == MenuState::menuIdle && rotaryEncoder.ClickOccured()) { menuState = MenuState::menuWaking;}
+		
+        // Draw UI elements
+		battery      .update();
+		timer        .update();		
+        menuAndNumbersUpdate();
+        display      .update();  // Update the screen depending on update requests.
 
+        // Update control values (
         controlValues.lock();
         controlValues.targetTemperature = setTemperature.getTargetTemperature();
         controlValues.unlock();
@@ -200,6 +186,25 @@ void taskMain(void* pvParameters)
 
         // todo: make waiting time adaptive.
         //vTaskDelay(50 / portTICK_PERIOD_MS); 
+    }
+}
+
+void menuAndNumbersUpdate()
+{
+    switch (menuState)
+    {
+    case MenuState::menuIdle:
+        // Draw temperature menu. Target temperature either from rotary encoder or from last stored value
+        setTemperature.update(rotaryEncoder.readEncoderValue());
+        break;
+    default:
+        // Draw menu
+        menuControl.update(menuState);
+        if (menuState == MenuState::menuIdle)
+        {	// We switched to menu idle, now restore position of rotary button
+            rotaryEncoder.setAcceleration(100);
+            rotaryEncoder.setEncoderValue(setTemperature.getTargetTemperature());
+        }
     }
 }
 

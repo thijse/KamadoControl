@@ -43,10 +43,18 @@ CHOOSE(tempControlSource, tempControlSourceSubmenu, "Choose", doNothing, noEvent
     , VALUE("Thermistor   4", -1, setTempControlSource, enterEvent)
 );
 
+MENU(pidSubmenu, "PID settings", doNothing, noEvent, wrapStyle
+    , FIELD(pPid, "P", "", 0.0,  10.0,  0.5, 0.1, setDamperMin, anyEvent, noStyle)
+    , FIELD(iPid, "I", "", 0.0, 120.0, 10.0, 0.5, setDamperMax, anyEvent, noStyle)
+    , FIELD(dPid, "D", "", 0.0,  10.0,  0.5, 0.1, setDamperMax, anyEvent, noStyle)
+    , EXIT("<Back")
+);
+
 /* Main menu */
 MENU(mainMenu, "Main menu", doNothing, noEvent, wrapStyle
     , SUBMENU(temperatureControlToggleSubmenu)
     , SUBMENU(tempControlSourceSubmenu)
+    , SUBMENU(pidSubmenu)
     , FIELD(damperMin, "Damper min", "", 0, 180, 10, 1, setDamperMin, anyEvent, noStyle)
     , FIELD(damperMax, "Damper max", "", 0, 180, 10, 1, setDamperMax, anyEvent, noStyle)
     , EXIT("<Back")
