@@ -1,4 +1,4 @@
-// https://savjee.be/2019/12/esp32-tips-to-increase-battery-life/
+// https://savjee.be/2019/12/esp32-tips-to-increase-batteryUI-life/
 // https://www.robmiles.com/journal/2020/1/20/disabling-the-esp32-brownout-detector
 
 
@@ -9,39 +9,36 @@
 #include <esp_wifi.h>
 #include <esp_bt.h>
 
+// System
 #include <SD.h>
 #include <SPI.h>
-#include "System.h"
-
 #include "Global.h"
-#include "AiEsp32RotaryEncoder.h"
+#include "System.h"
+#include "Esp32RotaryEncoder.h"
 #include "MeasureAndControl.h"
-#include "ThermoCouple.h"
 
 // UI
-#include "Screen.h"
-#include "Battery.h"
-#include "Time.h"
-#include "SetTemperature.h"
-//#include "Logo.h"
-//#include "SDCard.h"
-#include "Battery.h"
-#include "Timer.h"
-#include "MenuControl.h"
-
-// FreeFonts from Adafruit_GFX
 #include <Fonts/FreeMonoBold9pt7b.h>
-#include <Fonts/FreeMonoBold12pt7b.h>
-#include <Fonts/FreeMonoBold18pt7b.h>
-#include <Fonts/FreeMonoBold24pt7b.h>
+#include "Screen.h"
+#include "BatteryUI.h"
+//#include "Time.h"
+#include "MainValuesUI.h"
+#include "TimerUI.h"
+#include "MenuUI.h"
 
-ControlValues     controlValues;
-MeasureAndControl measureControl(wireMutex, &controlValues);
 
-Battery           battery(&display, BATTERY_PIN);
-Timer             timer  (&display);
-SetTemperature    setTemperature(&display);
-MenuControl       menuControl(&display, &controlValues);
+
+// System
+AppState          appState;        // holds application state (that the MeasureAndControl loop does not need to know about)
+ControlValues     controlValues;   // holds control values & state the MeasureAndControl loop needs to know about
+MeasurementData   measurements;    // holds measurements coming back from the MeasureAndControl loop 
+MeasureAndControl measureControl( wireMutex, &controlValues, &measurements);
+
+// UI
+BatteryUI         batteryUI     (& display, BATTERY_PIN);
+TimerUI           timerUI       (& display);
+MainValuesUI      mainValuesUI  (& display, &controlValues, &measurements);
+MenuUI            menuUI        (& display, &appState, &controlValues);
 int               uiLoopCounter;
 int               measureLoopCounter;
 MenuState         menuState = MenuState::menuIdle;
@@ -67,10 +64,10 @@ void setup() {
     
     // initialize Serial communication 
     Serial.begin(115200);
-    while (!Serial && !Serial.available()) { delay(5); };
+    while (!Serial && !Serial.available()) { delay(5); }
     
     // Start console output & logging
-    Log.begin(LOG_LEVEL_ERROR, &Serial);
+    Log.begin(LOG_LEVEL_VERBOSE, &Serial);
     Serial.println("Kamado Control build 1");
     Serial.println();
 
@@ -79,64 +76,58 @@ void setup() {
     measureLoopCounter = 0;
 
     // Initialize rotary click encoder    
-	rotaryEncoder.begin();
-		rotaryEncoder.setup(
-		[] { rotaryEncoder.readEncoder_ISR(); },
-		[] { rotaryEncoder.readButton_ISR(); });
-	rotaryEncoder.setAcceleration(100);
-	rotaryEncoder.setBoundaries(0, 500, false); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
-
+     rotaryEncoder.begin();
+     rotaryEncoder.setup(
+		[] {  rotaryEncoder.readEncoder_ISR(); },
+		[] {  rotaryEncoder.readButton_ISR (); });
+     rotaryEncoder.setAcceleration(100);
+     rotaryEncoder.setBoundaries(0, 500, false); //minValue, maxValue, circleValues true|false (when max go to min and vice versa)
 
     // Start SPI Communication
-    SPI.begin  (SPI_CLK   , SPI_MISO   , SPI_MOSI   , ELINK_SS);
+    SPI.begin  (SPI_CLK, SPI_MISO, SPI_MOSI, ELINK_SS);
 
     // Settings to reduce power consumption
     System::PowerSafeMode();
 
     // Initialize display
-    display.init         ();
-    display.setRotation  (3);
-    display.setFullWindow();
-    display.fillScreen   (GxEPD_WHITE);
-    display.setTextColor (GxEPD_BLACK);
-    display.setFont      (&FreeMonoBold9pt7b);
-    display.setCursor    (0, 0);
-
-    Serial.println(display.width());
-    Serial.println(display.height());
-
+     display.init         ();
+     display.setRotation  (3);
+     display.setFullWindow();
+     display.fillScreen   (GxEPD_WHITE);
+     display.setTextColor (GxEPD_BLACK);
+     display.setFont      (&FreeMonoBold9pt7b);
+     display.setCursor    (0, 0);
 
     // Initialize UI elements
-    battery       .init();
-    timer         .init();
-    setTemperature.init();
-    menuControl   .init();
-
+    batteryUI    .init();
+    timerUI      .init();
+    mainValuesUI .init();
+    menuUI       .init();
 
     // Draw UI elements
-    display       .fillScreen(GxEPD_WHITE);
-    battery       .draw();
-    timer         .draw();
-    setTemperature.draw();
-    menuControl   .draw();
-    display       .display(false); // full update
+     display.fillScreen(GxEPD_WHITE);
+    batteryUI      .draw();
+    timerUI        .draw();
+    mainValuesUI   .draw();
+    menuUI         .draw();
+     display.display(false); // full update
 
     xTaskCreatePinnedToCore(
         taskMain
         , "TaskMain"
         , 4096  // Todo: stack size can be checked & adjusted by reading the Stack Highwater
-        , NULL
+        , nullptr
         , 2  // 
-        , NULL
+        , nullptr
         , ARDUINO_RUNNING_CORE); // The core running Arduino
 
     xTaskCreatePinnedToCore(
         taskMeasureAndControl
         , "TaskMeasureAndControl"
         , 2048  // Stack size
-        , NULL
+        , nullptr
         , 1     // Priority
-        , NULL
+        , nullptr
         , 0);   // The core not running Arduino
     
 }
@@ -156,34 +147,27 @@ void taskMain(void* pvParameters)
 
 	for (;;) // A Task shall never return or exit.
 	{
-		// Log.traceln(F("ui loop %d"),uiLoopCounter++);
-		// Check for button press in menu idle state
-		if (menuState == MenuState::menuIdle && rotaryEncoder.ClickOccured()) { menuState = MenuState::menuWaking;}
-		
+        //Log.traceln(F("ui loop %d"), uiLoopCounter++);
+
+	    // Check for button press in menu idle state
+		if (menuState == MenuState::menuIdle &&  rotaryEncoder.ClickOccured()) { menuState = MenuState::menuWaking;}         
+
         // Draw UI elements
-		battery      .update();
-		timer        .update();		
-        menuAndNumbersUpdate();
-        display      .update();  // Update the screen depending on update requests.
+		batteryUI      .update();
+		timerUI        .update();		        
+	    menuAndNumbersUpdate();
+         display.update();  // Update the screen depending on update requests.              
 
-        // Update control values (
-        controlValues.lock();
-        controlValues.targetTemperature = setTemperature.getTargetTemperature();
-        controlValues.unlock();
+    /*        Serial.print("Temperature 0     : ") ; if (measurements.temperatureResults.success[0]) Serial.println(measurements.temperatureResults.temperature[0]); else Serial.println("--:--");
+            Serial.print("Temperature 1     : ") ; if (measurements.temperatureResults.success[1]) Serial.println(measurements.temperatureResults.temperature[1]); else Serial.println("--:--");
+            Serial.print("Temperature 2     : ") ; if (measurements.temperatureResults.success[2]) Serial.println(measurements.temperatureResults.temperature[2]); else Serial.println("--:--");
+            Serial.print("Temperature 3     : ") ; if (measurements.temperatureResults.success[3]) Serial.println(measurements.temperatureResults.temperature[3]); else Serial.println("--:--");
+            Serial.print("Temperature 4     : ") ; if (measurements.temperatureResults.success[4]) Serial.println(measurements.temperatureResults.temperature[4]); else Serial.println("--:--");
+            Serial.print("Temperature 5     : ") ; if (measurements.temperatureResults.success[5]) Serial.println(measurements.temperatureResults.temperature[5]); else Serial.println("--:--");
+            Serial.print("Target Temperature: ") ; Serial.println(measurements.targetTemperature);
+*/
+            //mainValuesUI.setCurrentTemperature(data->temperatureResults.temperature[controlValues.tempControlSource], data->damperValue);                        
         
-        MeasurementData* data = measureControl.getMeasurements();
-        if (data != nullptr) {
-            //Serial.print("Temperature 0     : ") ; if (data->temperatureResults.success[0]) Serial.println(data->temperatureResults.temperature[0]); else Serial.println("--:--");
-            //Serial.print("Temperature 1     : ") ; if (data->temperatureResults.success[1]) Serial.println(data->temperatureResults.temperature[1]); else Serial.println("--:--");
-            //Serial.print("Temperature 2     : ") ; if (data->temperatureResults.success[2]) Serial.println(data->temperatureResults.temperature[2]); else Serial.println("--:--");
-            //Serial.print("Temperature 3     : ") ; if (data->temperatureResults.success[3]) Serial.println(data->temperatureResults.temperature[3]); else Serial.println("--:--");
-            //Serial.print("Temperature 4     : ") ; if (data->temperatureResults.success[4]) Serial.println(data->temperatureResults.temperature[4]); else Serial.println("--:--");
-            //Serial.print("Temperature 5     : ") ; if (data->temperatureResults.success[5]) Serial.println(data->temperatureResults.temperature[5]); else Serial.println("--:--");
-            //Serial.print("Target Temperature: ") ; Serial.println(data->targetTemperature);
-
-            setTemperature.setCurrentTemperature(data->temperatureResults.temperature[controlValues.tempControlSource], data->damperValue);
-        }                
-
         // todo: make waiting time adaptive.
         //vTaskDelay(50 / portTICK_PERIOD_MS); 
     }
@@ -195,15 +179,15 @@ void menuAndNumbersUpdate()
     {
     case MenuState::menuIdle:
         // Draw temperature menu. Target temperature either from rotary encoder or from last stored value
-        setTemperature.update(rotaryEncoder.readEncoderValue());
+        mainValuesUI.update((int16_t) rotaryEncoder.readEncoderValue());
         break;
     default:
         // Draw menu
-        menuControl.update(menuState);
+        menuUI.update(menuState);
         if (menuState == MenuState::menuIdle)
         {	// We switched to menu idle, now restore position of rotary button
-            rotaryEncoder.setAcceleration(100);
-            rotaryEncoder.setEncoderValue(setTemperature.getTargetTemperature());
+             rotaryEncoder.setAcceleration(100);
+             rotaryEncoder.setEncoderValue(mainValuesUI.getTargetTemperature());
         }
     }
 }
@@ -214,7 +198,7 @@ void taskMeasureAndControl(void* pvParameters)  // This is a task.
 
     for (;;)
     {
-        Log.traceln(F("measure loop %d"), measureLoopCounter++);
+        //Log.traceln(F("measure loop %d"), measureLoopCounter++);
         measureControl.update();
         vTaskDelay((1000 ) / portTICK_PERIOD_MS);
     }

@@ -84,7 +84,7 @@ float ThermistorConversion::getTempCelsius(uint16_t adcValue)
 	// Account for dissipation factor K
 	//rt         -=  vt * vt / (_k * _r0);
 
-	Log.noticeln(F("adcValue = %i, adcMax = %i, _vRef = %F, v0 = %F, rt = %F"), adcValue, _adcMax, _vRef, vt,rt);
+	//Log.noticeln(F("adcValue = %i, adcMax = %i, _vRef = %F, v0 = %F, rt = %F"), adcValue, _adcMax, _vRef, vt,rt);
 
 	return steinhartHart(rt);
 }

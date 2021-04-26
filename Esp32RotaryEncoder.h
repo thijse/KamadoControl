@@ -1,4 +1,4 @@
-// AiEsp32RotaryEncoder.h
+// Esp32RotaryEncoder.h
 // based on https://github.com/marcmerlin/IoTuz code - extracted and modified Encoder code
 
 #ifndef _AIESP32ROTARYENCODER_h
@@ -22,7 +22,7 @@ typedef enum
 	BUT_DISABLED = 99,
 } ButtonState;
 
-class AiEsp32RotaryEncoder
+class Esp32RotaryEncoder
 {
 
 private:
@@ -49,7 +49,7 @@ private:
 	void (*ISR_button)();
 
 public:
-	AiEsp32RotaryEncoder(
+	Esp32RotaryEncoder(
 		uint8_t encoderAPin = AIESP32ROTARYENCODER_DEFAULT_A_PIN,
 		uint8_t encoderBPin = AIESP32ROTARYENCODER_DEFAULT_B_PIN,
 		uint8_t encoderButtonPin = AIESP32ROTARYENCODER_DEFAULT_BUT_PIN);

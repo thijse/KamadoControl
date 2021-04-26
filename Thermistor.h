@@ -17,7 +17,7 @@ class Thermistor {
       // Destructor
       ~Thermistor();
       void              readTemperature(int no,TemperatureResults& temperatureResults);
-      bool              readTemperature(byte channel, float& value);            
+      bool              readTemperature(byte channel, volatile float& value);            
 
   private:
       ADC                 &_adc;

@@ -1,6 +1,6 @@
-#include "Battery.h"
+#include "BatteryUI.h"
 
-Battery::Battery(
+BatteryUI::BatteryUI(
     Screen* display,
     const int   batteryPin 
 ) :
@@ -18,21 +18,21 @@ Battery::Battery(
 {
 }
 
-void Battery::init()
+void BatteryUI::init()
 {
 }
 
-float Battery::getVoltage()
+float BatteryUI::getVoltage()
 {
     return (float)(analogRead(_batteryPin)) * _adcScale;
 }
 
-int Battery::getPercentage()
+int BatteryUI::getPercentage()
 {
     return (int)((getVoltage() - _vMin) * _vSlope);
 }
 
-void Battery::draw()
+void BatteryUI::draw()
 {
     // Draw outer lines
     _display->drawRect(_posX       , _posY  ,_width, _height  , GxEPD_BLACK); // outer walls battery
@@ -40,7 +40,7 @@ void Battery::draw()
     update();
 }
 
-void Battery::update()
+void BatteryUI::update()
 {
     int voltage = getVoltage();
     // Draw percentage lines

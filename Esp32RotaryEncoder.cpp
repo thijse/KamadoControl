@@ -2,9 +2,9 @@
 //
 //
 
-#include "AiEsp32RotaryEncoder.h"
+#include "Esp32RotaryEncoder.h"
 
-void IRAM_ATTR AiEsp32RotaryEncoder::readEncoder_ISR()
+void IRAM_ATTR Esp32RotaryEncoder::readEncoder_ISR()
 {
 
 	unsigned long now = millis();
@@ -63,7 +63,7 @@ void IRAM_ATTR AiEsp32RotaryEncoder::readEncoder_ISR()
 }
 
 
-void IRAM_ATTR AiEsp32RotaryEncoder::readButton_ISR()
+void IRAM_ATTR Esp32RotaryEncoder::readButton_ISR()
 {
 	if (!digitalRead(this->encoderButtonPin))
 	{
@@ -72,7 +72,7 @@ void IRAM_ATTR AiEsp32RotaryEncoder::readButton_ISR()
 }
 
 
-AiEsp32RotaryEncoder::AiEsp32RotaryEncoder(uint8_t encoder_APin, uint8_t encoder_BPin, uint8_t encoder_ButtonPin)
+Esp32RotaryEncoder::Esp32RotaryEncoder(uint8_t encoder_APin, uint8_t encoder_BPin, uint8_t encoder_ButtonPin)
 {
 	this->encoderAPin = encoder_APin;
 	this->encoderBPin = encoder_BPin;
@@ -82,7 +82,7 @@ AiEsp32RotaryEncoder::AiEsp32RotaryEncoder(uint8_t encoder_APin, uint8_t encoder
 	pinMode(this->encoderBPin, INPUT);
 }
 
-void AiEsp32RotaryEncoder::setBoundaries(long minEncoderValue, long maxEncoderValue, bool circleValues)
+void Esp32RotaryEncoder::setBoundaries(long minEncoderValue, long maxEncoderValue, bool circleValues)
 {
 	this->_minEncoderValue = minEncoderValue;
 	this->_maxEncoderValue = maxEncoderValue;
@@ -90,7 +90,7 @@ void AiEsp32RotaryEncoder::setBoundaries(long minEncoderValue, long maxEncoderVa
 	this->_circleValues = circleValues;
 }
 
-bool AiEsp32RotaryEncoder::ClickOccured(bool peek)
+bool Esp32RotaryEncoder::ClickOccured(bool peek)
 {
 	bool co = this->click_occured;
 	if (co && !peek)
@@ -100,7 +100,7 @@ bool AiEsp32RotaryEncoder::ClickOccured(bool peek)
 	return co;
 }
 
-ButtonState AiEsp32RotaryEncoder::currentButtonState()
+ButtonState Esp32RotaryEncoder::currentButtonState()
 {
 	if (!this->isEnabled)
 	{
@@ -109,24 +109,24 @@ ButtonState AiEsp32RotaryEncoder::currentButtonState()
 	return !digitalRead(this->encoderButtonPin) ? BUT_DOWN : BUT_UP;
 }
 
-long AiEsp32RotaryEncoder::readEncoderValue()
+long Esp32RotaryEncoder::readEncoderValue()
 {
 	return (this->encoderPos);
 }
 
-void AiEsp32RotaryEncoder::setEncoderValue(long newValue)
+void Esp32RotaryEncoder::setEncoderValue(long newValue)
 {
 	reset(newValue);
 }
 
 
-void AiEsp32RotaryEncoder::setup(void (*ISR_callback)(void), void (*ISR_button)(void))
+void Esp32RotaryEncoder::setup(void (*ISR_callback)(void), void (*ISR_button)(void))
 {
 	attachInterrupt(digitalPinToInterrupt(this->encoderBPin), ISR_callback, FALLING);
 	attachInterrupt(digitalPinToInterrupt(this->encoderButtonPin), ISR_button, CHANGE);
 }
 
-void AiEsp32RotaryEncoder::begin()
+void Esp32RotaryEncoder::begin()
 {
 	// Initialize rotary encoder reading and decoding
 	if (this->encoderButtonPin >= 0)
@@ -136,7 +136,7 @@ void AiEsp32RotaryEncoder::begin()
 }
 
 
-void AiEsp32RotaryEncoder::reset(long newValue_)
+void Esp32RotaryEncoder::reset(long newValue_)
 {
 	newValue_ = newValue_;
 	this->encoderPos = newValue_;
@@ -146,12 +146,12 @@ void AiEsp32RotaryEncoder::reset(long newValue_)
 		this->encoderPos = this->_circleValues ? this->_maxEncoderValue : this->_minEncoderValue;
 }
 
-void AiEsp32RotaryEncoder::enable()
+void Esp32RotaryEncoder::enable()
 {
 	this->isEnabled = true;
 }
 
-void AiEsp32RotaryEncoder::disable()
+void Esp32RotaryEncoder::disable()
 {
 	this->isEnabled = false;
 }

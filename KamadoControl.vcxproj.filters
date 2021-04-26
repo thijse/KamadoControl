@@ -22,22 +22,19 @@
     <None Include="KamadoControl.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Timer.h">
+    <ClInclude Include="TimerUI.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Battery.h">
+    <ClInclude Include="BatteryUI.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="SetTemperature.h">
+    <ClInclude Include="MainValuesUI.h">
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="AutoResetEvent.h">
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="System.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="TripleBuffer.h">
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="State.h">
@@ -61,7 +58,6 @@
     <ClInclude Include="__vm\.KamadoControl.vsarduino.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="Global.h" />
     <ClInclude Include="Fonts\FreeSans7pt7b.h">
       <Filter>Fonts</Filter>
     </ClInclude>
@@ -86,7 +82,7 @@
     <ClInclude Include="DamperControl.h">
       <Filter>TemperatureControl</Filter>
     </ClInclude>
-    <ClInclude Include="MenuControl.h">
+    <ClInclude Include="MenuUI.h">
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="GxEPDOut.h">
@@ -95,18 +91,21 @@
     <ClInclude Include="RotaryClickEncoderStream.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="AiEsp32RotaryEncoder.h">
+    <ClInclude Include="Esp32RotaryEncoder.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Global.h">
       <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Battery.cpp">
+    <ClCompile Include="BatteryUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="SetTemperature.cpp">
+    <ClCompile Include="MainValuesUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
+    <ClCompile Include="TimerUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="ADC.cpp">
@@ -133,11 +132,13 @@
     <ClCompile Include="DamperControl.cpp">
       <Filter>TemperatureControl</Filter>
     </ClCompile>
-    <ClCompile Include="MenuControl.cpp">
+    <ClCompile Include="MenuUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="Global.cpp" />
-    <ClCompile Include="AiEsp32RotaryEncoder.cpp">
+    <ClCompile Include="Esp32RotaryEncoder.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Global.cpp">
       <Filter>System</Filter>
     </ClCompile>
   </ItemGroup>

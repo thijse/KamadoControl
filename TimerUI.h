@@ -7,7 +7,7 @@
 #include <GxEPD2.h>
 #include "Screen.h"
 
-class Timer
+class TimerUI
 {
 protected:
 	Screen*       _display;
@@ -17,12 +17,12 @@ protected:
 	int16_t       _y;
 	uint16_t      _w;
 	uint16_t      _h;
-	unsigned long _time_start_ms;
-	char          _prevTime[6];
+	unsigned long _time_start_ms{};
+	char          _prevTime[6]{};
 public:
-	Timer           (const Timer& other) = delete;
-	Timer& operator=(const Timer& other) = delete;
-	Timer(Screen* display);
+	TimerUI           (const TimerUI& other) = delete;
+	TimerUI& operator=(const TimerUI& other) = delete;
+	TimerUI(Screen* display);
 	void init();
 	void update();
 	void draw();

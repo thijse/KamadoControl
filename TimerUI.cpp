@@ -1,4 +1,4 @@
-#include "Timer.h"
+#include "TimerUI.h"
 #include <Fonts/FreeMonoBold9pt7b.h>
 #include "Fonts/FreeSans8pt7b.h"
 #include "Fonts/FreeSansBold8pt7b.h"
@@ -6,14 +6,14 @@
 
 
 
-Timer::Timer(Screen* display) :
+TimerUI::TimerUI(Screen* display) :
     _display(display),
     _posX(175), _posY(10),
     _x(0), _y(0), _w(0), _h(0)
 {
 }
 
-void Timer::init()
+void TimerUI::init()
 {
     _time_start_ms = millis();
     // Create writing area
@@ -23,13 +23,13 @@ void Timer::init()
     _x--; _y--; _w+=2; _h+=2;  // 1 pixel border
 }
 
-void Timer::draw()
+void TimerUI::draw()
 {
     // initial drawing same as update
     update();
 }
 
-void Timer::update()
+void TimerUI::update()
 {
     _display->setFont(&FreeSansBold8pt7b);
     //Serial.print("Width  "); Serial.println(_display->width());
@@ -52,7 +52,7 @@ void Timer::update()
     _display->println(time_string);
 
     if (time_string[0] != _prevTime[0]) {
-        _display->updateRequest(Screen::full); // Alway a full update on last digit change
+        _display->updateRequest(Screen::full); // Always a full update on last digit change
     }
     else {
         _display->updateRequest((time_string[1] == _prevTime[1] && time_string[3] == _prevTime[3] && time_string[4] == _prevTime[4]) ? Screen::none : Screen::partial); // partial update on other items

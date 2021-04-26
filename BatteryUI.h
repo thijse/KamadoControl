@@ -1,4 +1,4 @@
-// Battery
+// BatteryUI
 #pragma once 
 #include "arduino.h"
 #include <GxEPD2_GFX.h>
@@ -7,7 +7,7 @@
 #include <GxEPD2.h>
 #include "Screen.h"
 
-class Battery
+class BatteryUI
 {
 	protected:
 		const float   _adcScale = 1.0 / 4095.0 * 2.0 * 3.3 * 1.1;
@@ -26,9 +26,9 @@ class Battery
 		int           _prevBarLength;
 
 	public:
-		Battery           (const Battery& other) = delete;
-		Battery& operator=(const Battery& other) = delete;
-		Battery(
+		BatteryUI           (const BatteryUI& other) = delete;
+		BatteryUI& operator=(const BatteryUI& other) = delete;
+		BatteryUI(
 			Screen* display,
 			const int   batteryPin
 		);

@@ -25,7 +25,7 @@ ex: -A0 means: pin A0 normally high, low when button pushed (reverse logic)
 #pragma once
 
 #include <Arduino.h>
-#include "AiEsp32RotaryEncoder.h"
+#include "Esp32RotaryEncoder.h"
 
 #include <menuDefs.h>
 
@@ -35,10 +35,10 @@ namespace Menu {
 	//buffer not needer because we have an accumulator
 	class RotaryClickEncoderStream :public menuIn {
 	public:
-		AiEsp32RotaryEncoder &enc; //associated hardware clickEncoder
+		Esp32RotaryEncoder &enc; //associated hardware clickEncoder
 		int oldPos;
 
-		RotaryClickEncoderStream(AiEsp32RotaryEncoder &enc)
+		RotaryClickEncoderStream(Esp32RotaryEncoder &enc)
 			:enc(enc)
 		{
 			flush();

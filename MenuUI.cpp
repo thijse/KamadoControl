@@ -1,11 +1,12 @@
-#include "MenuControl.h"
+#include "MenuUI.h"
 
 #include <Fonts/FreeMonoBold9pt7b.h>
 #include "Fonts/FreeSansBold8pt7b.h"
 #include "Fonts/FreeSans8pt7b.h"
 #include <Fonts/Picopixel.h>
 
-MenuControl* pointerToMenuControl = nullptr;
+
+MenuUI* pointerToMenuControl = nullptr;
 
 
 // Stubs to connect to class functions
@@ -18,13 +19,12 @@ result idle                 (menuOut & o, idleEvent e)                { if (poin
 
 /* Toggle temperature control */
 int    temperatureControl      = HIGH;
-bool   calibrateDamperMinMax   = false;
 int    damperMin               = 0;
 int    damperMax               = 180;
-int    damperVal               = 90;
+//int    damperVal               = 90;
 int    tempControlSource       = -1;
-double pPid                    = 1.0;
-double iPid                    = 60.0;
+double pPid                    = 4.5;
+double iPid                    = 1.200;
 double dPid                    = 0.0 ;
 
 TOGGLE(temperatureControl, temperatureControlToggleSubmenu, "Temp control: ", doNothing, noEvent, noStyle
@@ -44,8 +44,8 @@ CHOOSE(tempControlSource, tempControlSourceSubmenu, "Choose", doNothing, noEvent
 );
 
 MENU(pidSubmenu, "PID settings", doNothing, noEvent, wrapStyle
-    , FIELD(pPid, "P", "", 0.0,  10.0,  0.5, 0.1, setDamperMin, anyEvent, noStyle)
-    , FIELD(iPid, "I", "", 0.0, 120.0, 10.0, 0.5, setDamperMax, anyEvent, noStyle)
+    , FIELD(pPid, "P", "", 0.0,  20.0,  0.5, 0.1, setDamperMin, anyEvent, noStyle)
+    , FIELD(iPid, "I", "", 0.0, 500.0, 10.0, 0.5, setDamperMax, anyEvent, noStyle)
     , FIELD(dPid, "D", "", 0.0,  10.0,  0.5, 0.1, setDamperMax, anyEvent, noStyle)
     , EXIT("<Back")
 );
@@ -60,11 +60,6 @@ MENU(mainMenu, "Main menu", doNothing, noEvent, wrapStyle
     , EXIT("<Back")
 );
 
-// define menu colors --------------------------------------------------------
-
-//monochromatic color table
-//#define GxEPD_BLACK RGB565(0,0,0)
-//#define GxEPD_WHITE RGB565(255,255,255)
 
 //  {{disabled normal,disabled selected},{enabled normal,enabled selected, enabled editing}}
 const colorDef<uint16_t> colors[6] MEMMODE = {
@@ -96,7 +91,7 @@ const int menuColumns = menuWidth  / fontW;
 const int menuLines   = menuHeight / fontH;
 
 
-RotaryClickEncoderStream encStream(rotaryEncoder);
+RotaryClickEncoderStream encStream( rotaryEncoder);
 
 const panel panels[] MEMMODE = { {0, 0, menuColumns, menuLines} }; // Main menu panel
 //const panel panels[] MEMMODE = { {0, 0, 200/ fontW, 100/ fontH} }; // Main menu panel
@@ -104,7 +99,7 @@ navNode*   nodes[sizeof(panels) / sizeof(panel)]; //navNodes to store navigation
 panelsList pList(panels, nodes, sizeof(panels) / sizeof(panel)); //a list of panels and nodes
 //idx_t tops[MAX_DEPTH]={0,0}; // store cursor positions for each level
 idx_t      eSpiTops[MAX_DEPTH] = { 0 };
-GxEPDOut   gxEPDOut(display, colors, eSpiTops, pList, fontW, fontH + 1, menuLeft,menuTop ,12);
+GxEPDOut   gxEPDOut( display, colors, eSpiTops, pList, fontW, fontH + 1, menuLeft,menuTop ,12);
 idx_t      serialTops[MAX_DEPTH] = { 0 };
 serialOut  outSerial(Serial, serialTops);
 menuOut* constMEM outputs[] MEMMODE = { &gxEPDOut }; // { &outSerial, & gxEPDOut };            //list of output devices
@@ -117,8 +112,9 @@ NAVROOT(nav, mainMenu, MAX_DEPTH, encStream, out);
 
 /***********************************************************************************************/
 
-MenuControl::MenuControl(Screen* display, ControlValues* controlValues) :
+MenuUI::MenuUI(Screen* display, AppState *appState, ControlValues *controlValues) :
     _display      (display),
+    _appState     (appState),
     _controlValues(controlValues),
     _posX         (40),
     _posY         (10),
@@ -128,11 +124,11 @@ MenuControl::MenuControl(Screen* display, ControlValues* controlValues) :
 
 }
 
-void MenuControl::init()
+void MenuUI::init()
 {
     if (pointerToMenuControl != nullptr)
     {
-        //Log.errorln(F("Already a MenuControl class instantiated. There can be only one "));
+        //Log.errorln(F("Already a MenuUI class instantiated. There can be only one "));
         return; // throw;
     }
     pointerToMenuControl = this;
@@ -149,14 +145,14 @@ void MenuControl::init()
     nav.idleTask = idle; //point a function to be used when menu is suspended
 }
 
-void MenuControl::draw()
+void MenuUI::draw()
 {
     // initial drawing same as update
     //update(MenuState::idle);
 }
 
 // Returns true when menu is turned off
-bool MenuControl::update(MenuState &menuState)
+bool MenuUI::update(MenuState &menuState)
 {
 	if (menuState == MenuState::menuIdle)
 	{
@@ -165,15 +161,18 @@ bool MenuControl::update(MenuState &menuState)
     // Check if menu is starting, running or idle
     if (menuState == MenuState::menuWaking)
 	{  
-		menuState = MenuState::menuActive; 
-		internalMenuState = MenuState::menuActive; 
-		nav.reset();
-		rotaryEncoder.setAcceleration(0);
+		// No idea
+		setControlValues(); // set current values to control values
 		encStream.flush();							// flush makes sure we are not going to take steps when switching to menu mode
-		// @@@ TO DO: MAKE SURE LIMITS OF ROTARY ENCODER ARE TURNED OFF!!!
+		nav.reset();
+		nav.idleOff();
+		menuState = MenuState::menuActive;
+		internalMenuState = MenuState::menuActive;
+         rotaryEncoder.setAcceleration(0);
+		// TO DO: MAKE SURE LIMITS OF ROTARY ENCODER ARE TURNED OFF!!!
 	}
-    
-	// No idea
+        
+
     setControlValues(); // set current values to control values
     // Set font
     _display->setFont(&FreeSansBold8pt7b);
@@ -184,7 +183,7 @@ bool MenuControl::update(MenuState &menuState)
 	}
 	// Generate output
 	nav.doOutput();
-	// Dunno
+
     getControlValues();// gets update values from control values
 
     if (internalMenuState == MenuState::menuIdleStart) {
@@ -200,101 +199,93 @@ bool MenuControl::update(MenuState &menuState)
 	return menuState == MenuState::menuIdle;
 }
 
-void MenuControl::setControlValues()
+void MenuUI::setControlValues()
 {
-    // no lock needed, values are set in same thread, so will not be called while setting
     pPid                    = _controlValues->P;
-    iPid                    = _controlValues->I;
+    iPid                    = _controlValues->I*1e2;
     dPid                    = _controlValues->D;
     damperMin               = _controlValues->damperMin;
     damperMax               = _controlValues->damperMax;  
-    damperVal               = _controlValues->damperVal;
+   
     tempControlSource       = _controlValues->tempControlSource;
-    temperatureControl      = _controlValues->temperatureControl;
-    calibrateDamperMinMax = _controlValues->calibrateDamperMinMax;
+    temperatureControl      = _appState->temperatureControl;
+    
 }
 
-void MenuControl::getControlValues()
+void MenuUI::getControlValues()
 {
-    _controlValues->lock();
     _controlValues->P                       = pPid;
-    _controlValues->I                       = iPid;
+    _controlValues->I                       = iPid*1e-2;
     _controlValues->D                       = dPid;
     _controlValues->damperMin               = damperMin;
     _controlValues->damperMax               = damperMax;
-    _controlValues->damperVal               = damperVal;
     _controlValues->tempControlSource       = tempControlSource;
-    _controlValues->temperatureControl      = temperatureControl;
-    _controlValues->calibrateDamperMinMax   = calibrateDamperMinMax;
-    _controlValues->unlock();
+    _appState->temperatureControl           = temperatureControl;
+    _controlValues->damperMode              = _appState->calibrateDamperMinMax!= DamperMode::damperModeNone? _appState->calibrateDamperMinMax: //calibrateDamperMinMax contains if damper calibration is going on, and if it is min or max
+                                              (_appState->temperatureControl? DamperMode::damperModeAutomatic: DamperMode::damperModeManual);
+
+    Serial.print("Set damperMode"); Serial.println(_controlValues->damperMode);
 }
 
-result MenuControl::setTemperatureControl(eventMask e, navNode& nav, prompt& item) {
+result MenuUI::setTemperatureControl(eventMask e, navNode& nav, prompt& item) {
     //Serial.print("\nTemperature control set to "); Serial.println(temperatureControl);
     //Serial.print("event type: ");
     //Serial.println(e);
     return proceed;
 }
 
-result MenuControl::setDamperMin(eventMask e, navNode& nav, prompt& item) {
+result MenuUI::setDamperMin(eventMask e, navNode& nav, prompt& item) {
     switch (e)
     {
     case Menu::enterEvent:
         //Serial.println("\npause measure&control");
-        calibrateDamperMinMax = true;
+        _appState->calibrateDamperMinMax = DamperMode::damperModeMin;
         break;
     case Menu::exitEvent:
     case Menu::blurEvent:
     case Menu::selBlurEvent:
         //Serial.println("\nresume measure&control");
-        calibrateDamperMinMax = false;
+        _appState->calibrateDamperMinMax = DamperMode::damperModeNone;
         break;
         return proceed;
     }
     if (damperMin > damperMax) damperMin = damperMax;
-    damperVal = damperMin;
-    //Serial.print("Set damper damper range to min value "); Serial.print(damperMin);
-    //Serial.print("Set damper damper val to "); Serial.print(damperVal);
     return proceed;
 }
 
-result MenuControl::setDamperMax(eventMask e, navNode& nav, prompt& item) {
+result MenuUI::setDamperMax(eventMask e, navNode& nav, prompt& item) {
     switch (e)
     {
     case Menu::enterEvent:
         //Serial.println("\npause measure&control");
         // todo: make this a pauze & resume to the temperatureControl state
-        calibrateDamperMinMax = true;
+        _appState->calibrateDamperMinMax = DamperMode::damperModeMax;
         break;
     case Menu::exitEvent:
     case Menu::blurEvent:
     case Menu::selBlurEvent:
         //Serial.println("\nresume measure&control");
-        calibrateDamperMinMax = false;
+        _appState->calibrateDamperMinMax = DamperMode::damperModeNone;
         break;
     return proceed;
     }
     if (damperMax < damperMin ) damperMax = damperMin;
-    damperVal = damperMax;
-    //Serial.print("Set damper damper range to max value "); Serial.print(damperMax);
-    //Serial.print("Set damper damper val to "); Serial.print(damperVal);
     return proceed;
 }
 
-result MenuControl::setTempControlSource(eventMask e, navNode& nav, prompt& item)
+result MenuUI::setTempControlSource(eventMask e, navNode& nav, prompt& item)
 {
     if (tempControlSource == -1) tempControlSource = 5;
     //Serial.print("Set temperature control source to "); Serial.print(tempControlSource);
     return proceed;
 }
 
-result MenuControl::setIdle(menuOut& o, idleEvent e) {
+result MenuUI::setIdle(menuOut& o, idleEvent e) {
     // 
     switch (e) {
     //case idleStart:        
     case idling:
         Serial.println("suspended...");
-        //_display->fillRect(menuLeft, menuTop, menuWidth, menuHeight, GxEPD_WHITE);
         o.clear();
         internalMenuState = MenuState::menuIdleStart;
         //nav.exit();

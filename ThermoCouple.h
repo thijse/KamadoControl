@@ -113,7 +113,7 @@ class ThermoCouple {
       // Get ID and version
       bool getDeviceID(byte &id) const;
       // Read temperature multiple times
-      bool readTemperature(float& temperature);
+      bool readTemperature(volatile float& temperature);
       // Get temperature in 1/16th degrees
       void readTemperature(int no, TemperatureResults& temperatureResults);
 

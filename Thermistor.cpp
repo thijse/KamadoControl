@@ -50,7 +50,7 @@ void Thermistor::readTemperature(int no, TemperatureResults &temperatureResults)
     return;
 }
 
-bool Thermistor::readTemperature(byte channel, float& temperature)
+bool Thermistor::readTemperature(byte channel, volatile float& temperature)
 {
     bool result, success = true;
     int16_t value = 0;

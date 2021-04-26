@@ -1,7 +1,8 @@
 #pragma once
 #include "arduino.h"
 #include "Screen.h"
-#include "AiEsp32RotaryEncoder.h"
+#include "Esp32RotaryEncoder.h"
+
 
 #if CONFIG_FREERTOS_UNICORE
 #define ARDUINO_RUNNING_CORE 0
@@ -9,7 +10,7 @@
 #define ARDUINO_RUNNING_CORE 1
 #endif
 
-// output pins
+    // output pins
 #define O_33V                     19
 #define O_50V1                    26
 #define O_50V2                    25
@@ -23,7 +24,7 @@
 #define SPI_MOSI                  23
 #define SPI_MISO                  -1
 #define SPI_CLK                   18
-                                
+
 // Screen pins                  
 #define ELINK_SS                   5
 #define ELINK_BUSY                 4
@@ -36,7 +37,7 @@
 //#define SDCARD_MOSI               15
 //#define SDCARD_MISO                2
 
-// Battery pin
+// BatteryUI pin
 #define BATTERY_PIN               35
 
 // Rotary encoder pins
@@ -47,7 +48,9 @@
 
 extern SemaphoreHandle_t wireMutex;
 extern Screen            display;
-extern AiEsp32RotaryEncoder rotaryEncoder; 
+extern Esp32RotaryEncoder rotaryEncoder;
+
+
 
 enum MenuState {
     menuIdle,
@@ -56,25 +59,49 @@ enum MenuState {
     menuWaking,
 };
 
-class ControlValues 
+enum DamperMode {
+    damperModeAutomatic,
+    damperModeManual,
+    damperModeMin,
+    damperModeMax,
+    damperModeNone,
+};
+
+
+// ControlValues holds control values & state the measure&control loop needs to know about
+class ControlValues
 {
 private:
     SemaphoreHandle_t _mutex = nullptr;
-public:   
+public:
     ControlValues           (const ControlValues& other) = delete;
     ControlValues& operator=(const ControlValues& other) = delete;
-    ControlValues() { _mutex = xSemaphoreCreateMutex();                   }
-    void lock()     { xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY);  }
-    void unlock()   { xSemaphoreGive(_mutex);                             }
+    ControlValues           () { _mutex = xSemaphoreCreateMutex(); }
+    void lock               () { xSemaphoreTake(_mutex, (TickType_t)portMAX_DELAY); }
+    void unlock             () { xSemaphoreGive(_mutex); }
 
-    int tempControlSource        = 0;
-    int temperatureControl       = HIGH;
-    bool calibrateDamperMinMax   = false;
-    int damperMin                = 0;
-    int damperMax                = 180;
-    int damperVal                = 90;
-    double P                     = 1.0;
-    double I                     = 60.0;
-    double D                     = 0.0;
-    float  targetTemperature     = 20; 
+    int        tempControlSource     = 0;    
+    int        damperMin             =   0;
+    int        damperMax             = 180;
+    int        damperVal             =  90;
+    
+    DamperMode damperMode            = DamperMode::damperModeAutomatic;
+    double P                         =   4.5;
+    double I                         =  1.2;
+    double D                         =   0.0;
+    float  targetTemperature         =  20;
 };
+
+// AppState holds state that the measure&control loop does not need to know about
+class AppState
+{
+public:
+    AppState                (const AppState& other) = delete;
+    AppState& operator=     (const AppState& other) = delete;
+    AppState()              { }
+
+    bool       temperatureControl    = true;
+    DamperMode calibrateDamperMinMax = DamperMode::damperModeNone;
+
+};
+

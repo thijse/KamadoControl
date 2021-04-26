@@ -119,10 +119,9 @@ bool ThermoCouple::getDeviceID(byte &id) const
     return true;
 }
 
-bool ThermoCouple::readTemperature(float& temperature)
+bool ThermoCouple::readTemperature(volatile float& temperature)
 {
-    int n       = 0;
-    temperature = 0;
+    int n       = 0;    
     // Setup for single 16 bit conversion
     TCDeviceConfig config{};
     config.setShutdownMode         (TCShutdownMode::Burst);
@@ -133,6 +132,7 @@ bool ThermoCouple::readTemperature(float& temperature)
     if (!clearStatus() || !setDeviceConfiguration(config))
     {
         Log.errorln(F("Failed starting conversion"));
+        Log.errorln(F("Thermocouple Temp: %F"), temperature);
         return false;
     }
     else
@@ -147,6 +147,7 @@ bool ThermoCouple::readTemperature(float& temperature)
         if (!stat.burstComplete())
         {
             Log.errorln(F("Failed while waiting for conversion (%d of 2 attempts)"), n);
+            Log.errorln(F("Thermocouple Temp: %F"), temperature);
         }
         else
         {
@@ -154,16 +155,20 @@ bool ThermoCouple::readTemperature(float& temperature)
             if (!getTemperatureRegister(temp))
             {
                 Log.errorln(F("Failed reading temperature"));
+                Log.errorln(F("Thermocouple Temp: %F"), temperature);
                 return false;
             }
             else
             {
+                
                 //sprintf(buf, "Temperature (1/16th of a degree): %d", temp);
                 temperature = 6.25E-2f * (float)temp;
+                Log.errorln(F("Thermocouple Temp: %F"), temperature);
                 return true;
             }
         }
     }
+    Log.errorln(F("Thermocouple Temp: %F"), temperature);
     return false;
 }
 

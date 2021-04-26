@@ -1,4 +1,4 @@
-#include "SetTemperature.h"
+#include "MainValuesUI.h"
 #include <Fonts/FreeMonoBold24pt7b.h>
 #include <Fonts/FreeMonoBold18pt7b.h>
 #include "Fonts/FreeSansBold32pt7b.h"
@@ -8,20 +8,22 @@
 
 // todo: rename class to SetValues;
 
-SetTemperature::SetTemperature(Screen* display) :
-    _display(display),
-    _posTempX  (25) , _posTempY  (80),    
-    _posXDamper(5)  , _posYDamper(10),
-    _xTemp     (0)   , _yTemp  (0)   , _wTemp  (0), _hTemp  (0),
-    _xDamper   (0)   , _yDamper(0)   , _wDamper(0), _hDamper(0),
-    _currentTemperature (20.0f),
+MainValuesUI::MainValuesUI(Screen* display, ControlValues* controlValues, MeasurementData* measurements) :
+    _display            (display),
+    _controlValues      (controlValues),
+    _measurements       (measurements),
+    _posTempX           (25) , _posTempY  (80),    
+    _posXDamper         (5)  , _posYDamper(10),
+    _xTemp              (0)   , _yTemp  (0)   , _wTemp  (0), _hTemp  (0),
+    _xDamper            (0)   , _yDamper(0)   , _wDamper(0), _hDamper(0),
     _targetTemperature  (20),
+    _currentTemperature (20.0f),
     _damperValue        (0)
 {
 
 }
 
-void SetTemperature::init()
+void MainValuesUI::init()
 {
     // Create writing area Temperature
     _display->setFont      (&FreeMonoBold24pt7b);
@@ -36,9 +38,15 @@ void SetTemperature::init()
 
 }
 
-void SetTemperature::update(int16_t new_target_temperature)
-{        
-	_targetTemperature = new_target_temperature;
+void MainValuesUI::update(int16_t targetTemperature)
+{
+	_targetTemperature                = targetTemperature;
+    _currentTemperature               = _measurements->temperatureResults.temperature[_controlValues->tempControlSource];
+    _damperValue                      = _measurements->damperValue;
+
+    _controlValues->targetTemperature = _targetTemperature;
+
+    setCurrentTemperature(_currentTemperature, _damperValue);
 
      // Set damper value in header
     _display->setFont(&FreeSansBold8pt7b);
@@ -47,7 +55,6 @@ void SetTemperature::update(int16_t new_target_temperature)
     _display->fillRect(_xDamper, _yDamper, _wDamper, _hDamper, GxEPD_WHITE);
     _display->setCursor(_posXDamper, _posYDamper);
     _display->println(_damperValue);
-
 
     _display->setFont      (&FreeMonoBold24pt7b);
     _display->setTextColor (GxEPD_BLACK);
@@ -62,20 +69,24 @@ void SetTemperature::update(int16_t new_target_temperature)
     _display->updateRequest(Screen::partial);
 }
 
-
-void SetTemperature::draw()
+void MainValuesUI::draw()
 {
     // initial drawing same as update
     //update();
 }
 
-int16_t SetTemperature::getTargetTemperature() const
+int16_t MainValuesUI::getTargetTemperature() const
 {
     return _targetTemperature;
 }
 
-void SetTemperature::setCurrentTemperature(float currentTemperature, int damperValue)
+void MainValuesUI::setCurrentTemperature(float currentTemperature, int damperValue)
 {
     _currentTemperature = currentTemperature;
     _damperValue        = damperValue;
+}
+
+void MainValuesUI::setDamperValue(int damperValue)
+{
+	_damperValue = damperValue;
 }

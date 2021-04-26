@@ -1,7 +1,6 @@
 // Triple buffer implementation
-// Implementation is not lockless, but lock only required for pointer switching
+// Implementation is not lockless, but lock only required for pointer switching/
 // Note: if Producer is faster than Consumer, consumer will miss buffers
-//       if the write buffer is only partially updated each time it is requested, consider using getClonedWriteBuffer
 
 #pragma once
 #include "arduino.h"
@@ -71,20 +70,6 @@ public:
 	/// <returns>Pointer to buffer of type T</returns>
 	T* getWriteBuffer() {
 		return (_writeIndex >= 0) ? &_buffers[_writeIndex] : nullptr;
-	}
-
-
-	/// <summary>
-	/// Gets a cloned value buffer to write in. 
-	/// The initial values are cloned from the last written buffer. 
-	//  This is requires a (time consuming) memcopy to be made, but is useful if buffer is only partially updated
-	//  Release after the values have been set
-	/// </summary>
-	/// <returns>Pointer to buffer of type T</returns>
-	T* getClonedWriteBuffer() {
-		if (_writeIndex <  0) return nullptr;
-		if (_newIndex   >= 0) memcpy ( &_newIndex, &_writeIndex, sizeof(_newIndex) ); // no locking needed because we assume the read thread will not update struct			
-		return &_buffers[_writeIndex];
 	}
 
 	/// <summary>
